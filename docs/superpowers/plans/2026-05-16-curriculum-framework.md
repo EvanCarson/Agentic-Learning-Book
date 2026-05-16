@@ -981,6 +981,13 @@ git commit -m "feat: add LessonLayout and /learn/[...slug] route"
 
 ### Task 9: Content model migration + cleanup
 
+> **Amendment 9b (review):** lesson `order` schema tightened from
+> `.nonnegative()` to `.positive()` (one-based, matches all data); the
+> Header Curriculum link gets `aria-current="page"` on `/learn*` via
+> `Astro.url`; CLAUDE.md Project says "Lessons are MDX" and the
+> Adding-a-lesson section gains build-time-moduleId / quiz-body-suppressed
+> caveats.
+
 **Files:**
 - Modify: `src/content.config.ts`
 - Create: `src/content/lessons/01-what-is-an-agent.mdx` (migrated)
