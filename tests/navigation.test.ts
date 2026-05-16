@@ -38,4 +38,17 @@ describe("getAdjacentTutorials", () => {
     expect(prev).toBeNull();
     expect(next).toBeNull();
   });
+
+  it("returns both null when entries is empty", () => {
+    const { prev, next } = getAdjacentTutorials([], "a");
+    expect(prev).toBeNull();
+    expect(next).toBeNull();
+  });
+
+  it("returns both null for a single-entry collection", () => {
+    const single: NavEntry[] = [{ slug: "only", title: "Only", order: 1 }];
+    const { prev, next } = getAdjacentTutorials(single, "only");
+    expect(prev).toBeNull();
+    expect(next).toBeNull();
+  });
 });
