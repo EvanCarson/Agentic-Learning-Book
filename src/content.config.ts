@@ -7,6 +7,8 @@ const tutorials = defineCollection({
   schema: z.object({
     title: z.string(),
     order: z.number().int().nonnegative(),
+    // Reserved for a future <meta name="description"> / listing blurb.
+    // Required so every tutorial ships a one-line summary up front.
     summary: z.string(),
   }),
 });

@@ -35,13 +35,14 @@ import PyRunner from "../../components/PyRunner.tsx";
 
 ## Known limitations
 
-- **PyRunner code indentation:** The MDX compiler normalizes the
-  whitespace of the template literal passed to the `code` prop of
-  `<PyRunner />`, reducing 4-space Python indentation to 2-space in the
-  rendered editor.
-  The code still runs correctly, but learners editing it should match the
-  existing 2-space indentation (adding PEP 8 4-space lines will raise
-  `IndentationError`). A future improvement is to load snippet code from a
+- **PyRunner code indentation:** MDX normalizes the indentation of the
+  template literal passed to the `code` prop of `<PyRunner />`, reducing
+  the first level from 4 spaces to 2 (and nested blocks from 8 to 6). The
+  sample code still runs correctly — indentation stays consistent within
+  each block. But when adding lines in the editor, match what is already
+  shown (2-space top-level bodies, 6-space nested blocks); introducing
+  PEP 8 4-space lines into an existing 2-space block raises
+  `IndentationError`. A future improvement is to load snippet code from a
   separate raw-imported `.py` file to preserve exact whitespace.
 - **In-browser Python run is a manual check:** automated build/typecheck
   cannot exercise the live Pyodide runtime (it loads in a real browser).
