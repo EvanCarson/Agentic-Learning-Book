@@ -1,43 +1,67 @@
-# Astro Starter Kit: Minimal
+# Agentic Learning Book
 
-```sh
-npm create astro@latest -- --template minimal
+An interactive web app teaching agentic AI. Tutorials are MDX; the Python
+code runs entirely in your browser via Pyodide (no backend).
+
+## Develop
+
+```bash
+npm install
+npm run dev      # http://localhost:4321
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Verify
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+npm test         # unit tests (navigation helper, Vitest)
+npm run typecheck # astro check — authoritative type gate
+npm run build    # static site -> dist/ (validates content schema)
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Note: `npm run build` uses esbuild and does NOT type-check. Always run
+`npm run typecheck` for type validation.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Add a tutorial
 
-Any static assets, like images, can be placed in the `public/` directory.
+Create `src/content/tutorials/NN-slug.mdx` with frontmatter
+`title`, `order`, `summary`. It appears in the sidebar automatically,
+ordered by `order`. Embed a runnable snippet with:
 
-## 🧞 Commands
+```mdx
+import PyRunner from "../../components/PyRunner.tsx";
 
-All commands are run from the root of the project, from a terminal:
+<PyRunner client:visible code={`print("hello")`} />
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Known limitations
 
-## 👀 Want to learn more?
+- **PyRunner code indentation:** The MDX compiler normalizes the
+  whitespace of the template-literal passed to `<PyRunner code={`...`}/>`,
+  reducing 4-space Python indentation to 2-space in the rendered editor.
+  The code still runs correctly, but learners editing it should match the
+  existing 2-space indentation (adding PEP 8 4-space lines will raise
+  `IndentationError`). A future improvement is to load snippet code from a
+  separate raw-imported `.py` file to preserve exact whitespace.
+- **In-browser Python run is a manual check:** automated build/typecheck
+  cannot exercise the live Pyodide runtime (it loads in a real browser).
+  See Manual verification below.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Manual verification (Pyodide runtime)
+
+```bash
+npm run preview
+```
+
+Open `http://localhost:4321/tutorials/01-what-is-an-agent`, press **Run**.
+After a Pyodide load delay the output panel should show:
+
+```
+obs='unknown topic' -> action='search'
+obs='known fact' -> action='answer'
+obs='unknown thing' -> action='search'
+```
+
+## Deploy
+
+`dist/` is fully static — host on GitHub Pages, Netlify, or any static
+host. No server required.
