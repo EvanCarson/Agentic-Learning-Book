@@ -35,6 +35,14 @@ describe("buildCurriculum", () => {
     const mods3 = [...mods, { id: "m3", title: "M3", order: 3, summary: "s3" }];
     expect(() => buildCurriculum(mods3, lessons)).toThrow(/module "m3" has no lessons/);
   });
+
+  it("throws on duplicate lesson slug", () => {
+    const dupSlug: LessonMeta[] = [
+      { slug: "a", moduleId: "m1", order: 1, type: "reading", title: "A", summary: "s", estMinutes: 1 },
+      { slug: "a", moduleId: "m2", order: 1, type: "reading", title: "A2", summary: "s", estMinutes: 1 },
+    ];
+    expect(() => buildCurriculum(mods, dupSlug)).toThrow(/duplicate lesson slug "a"/);
+  });
 });
 
 describe("adjacent", () => {
@@ -54,5 +62,14 @@ describe("adjacent", () => {
   });
   it("both null for unknown slug", () => {
     expect(adjacent(c, "zzz")).toEqual({ prev: null, next: null });
+  });
+
+  it("single-lesson curriculum returns both null", () => {
+    const oneMod = [{ id: "m1", title: "M1", order: 1, summary: "" }];
+    const oneLesson: LessonMeta[] = [
+      { slug: "solo", moduleId: "m1", order: 1, type: "reading", title: "S", summary: "", estMinutes: 1 },
+    ];
+    const solo = buildCurriculum(oneMod, oneLesson);
+    expect(adjacent(solo, "solo")).toEqual({ prev: null, next: null });
   });
 });

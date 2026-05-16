@@ -27,6 +27,14 @@ export function buildCurriculum(
 ): Curriculum {
   const byId = new Map(modules.map((m) => [m.id, m]));
 
+  const seenSlugs = new Set<string>();
+  for (const l of lessons) {
+    if (seenSlugs.has(l.slug)) {
+      throw new Error(`Curriculum: duplicate lesson slug "${l.slug}"`);
+    }
+    seenSlugs.add(l.slug);
+  }
+
   for (const l of lessons) {
     if (!byId.has(l.moduleId)) {
       throw new Error(
