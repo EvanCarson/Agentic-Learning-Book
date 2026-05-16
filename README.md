@@ -76,7 +76,22 @@ obs='known fact' -> action='answer'
 obs='unknown thing' -> action='search'
 ```
 
-## Deploy
+## Deploy (Vercel)
 
-`dist/` is fully static — host on GitHub Pages, Netlify, or any static
-host. No server required.
+This site is fully static and configured for Vercel via `vercel.json`
+(framework `astro`, build `npm run build`, output `dist/`, install
+`npm ci`). No serverless adapter is used.
+
+**Git-connected (recommended):** Import the repo at vercel.com → New
+Project. Vercel reads `vercel.json`; every push to the default branch
+deploys to production, and other branches/PRs get preview deployments.
+
+**CLI:** `npm i -g vercel`, then `vercel` (preview) or `vercel --prod`.
+
+`vercel.json` pins the build so local and Vercel builds match. The
+mandatory `npm run e2e` UI gate (see CLAUDE.md "Definition of Done") is
+NOT run by Vercel's build — run it in CI or locally before deploying.
+
+Being served at a domain root, the existing absolute links work as-is
+(no `base` path needed). The build output (`dist/`) is also hostable on
+any other static host.

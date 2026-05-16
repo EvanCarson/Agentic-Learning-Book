@@ -9,6 +9,15 @@ Tutorials are MDX; Python snippets run **entirely in the browser** via
 Pyodide (CPython→WASM). No backend, no accounts, no database. Deployable to
 any static host.
 
+## Deployment
+
+Static deploy to Vercel, configured by `vercel.json` (no SSR adapter —
+the site is fully static). Push-to-deploy when the repo is git-connected
+in Vercel. Vercel only runs `npm run build`; it does NOT run the
+test/typecheck/e2e gates — those must pass in CI or locally before
+deploying (see Definition of Done). `dist/` is also hostable on any
+static host.
+
 ## Commands
 
 ```bash
