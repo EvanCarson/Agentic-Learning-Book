@@ -1,17 +1,18 @@
 ---
-
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Agentic Learning">
+  <section class="py-12 text-center">
+    <h1 class="text-4xl font-bold">Learn to build AI agents</h1>
+    <p class="mx-auto mt-4 max-w-xl text-lg text-gray-600 dark:text-gray-400">
+      One interactive lesson at a time. Read, edit, and run real agent
+      code in your browser.
+    </p>
+    <a
+      href="/tutorials/01-what-is-an-agent"
+      class="mt-8 inline-block rounded bg-blue-600 px-5 py-2.5 font-medium text-white hover:bg-blue-700"
+    >
+      Begin: What Is an Agent &rarr;
+    </a>
+  </section>
+</BaseLayout>
