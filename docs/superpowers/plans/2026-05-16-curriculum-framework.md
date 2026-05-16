@@ -584,6 +584,12 @@ git commit -m "feat: add useProgress React hook"
 
 ### Task 5: QuizStub and MarkComplete islands
 
+> **Amendment (review):** QuizStub's `role="note"` div also gets
+> `aria-label={`Quiz: ${title}`}`; MarkComplete's incomplete-state class
+> adds explicit `text-gray-900 dark:text-gray-100` (resilient inside
+> `not-prose`); the decorative `✓` is wrapped in
+> `<span aria-hidden="true">` — consistent with the project a11y standard.
+
 **Files:**
 - Create: `src/components/QuizStub.tsx`
 - Create: `src/components/MarkComplete.tsx`
