@@ -19,7 +19,7 @@ const { title, slug, prev, next } = Astro.props;
     <article class="prose max-w-none dark:prose-invert">
       <h1>{title}</h1>
       <slot />
-      <nav class="mt-12 flex justify-between border-t border-gray-200 pt-4 text-sm dark:border-gray-800">
+      <nav aria-label="Tutorial navigation" class="mt-12 flex justify-between border-t border-gray-200 pt-4 text-sm dark:border-gray-800">
         {prev ? (
           <a href={`/tutorials/${prev.slug}`}>&larr; {prev.title}</a>
         ) : <span />}
