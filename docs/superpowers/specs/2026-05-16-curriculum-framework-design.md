@@ -35,7 +35,12 @@ UI rework.
   order. No gating/locking.
 - **Progress:** clean `ProgressStore` interface; `LocalStorageProgressStore`
   implementation in this slice. Subsystem A adds `SupabaseProgressStore`
-  behind the same interface.
+  behind the same interface. **Seam contract:** the interface is
+  intentionally *synchronous*. Subsystem A's design MUST honor this by
+  hydrating all progress into a local cache on mount and serving reads
+  from that cache (writes fire-and-forget + reconcile to Supabase) — not
+  by making the interface async. This keeps every consumer (sidebar,
+  syllabus, mark-complete islands) unchanged when the backend is swapped.
 - **Modeling approach (A1):** typed module config + `lessons` MDX
   collection + build-time integrity check.
 - **Authoring:** continues the existing MDX-in-repo content-collection

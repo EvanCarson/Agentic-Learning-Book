@@ -509,9 +509,15 @@ A React hook giving islands a live view of the store, re-rendering on the custom
 
 - [ ] **Step 1: Create `src/lib/progress/useProgress.ts`**
 
+> **Amendment (applied during execution of Task 3):** the event name is now
+> the shared constant `PROGRESS_CHANGED_EVENT` exported from
+> `./ProgressStore` — import and use it instead of the literal string so
+> the dispatcher and this listener cannot drift apart.
+
 ```ts
 import { useCallback, useEffect, useState } from "react";
 import { createLocalStorageProgressStore } from "./LocalStorageProgressStore";
+import { PROGRESS_CHANGED_EVENT } from "./ProgressStore";
 
 const store = createLocalStorageProgressStore();
 
@@ -520,10 +526,10 @@ export function useProgress() {
 
   useEffect(() => {
     const bump = () => setTick((t) => t + 1);
-    window.addEventListener("alb:progress-changed", bump);
+    window.addEventListener(PROGRESS_CHANGED_EVENT, bump);
     window.addEventListener("storage", bump);
     return () => {
-      window.removeEventListener("alb:progress-changed", bump);
+      window.removeEventListener(PROGRESS_CHANGED_EVENT, bump);
       window.removeEventListener("storage", bump);
     };
   }, []);
