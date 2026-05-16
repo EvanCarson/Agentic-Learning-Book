@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+
+interface Props { currentSlug?: string }
+const { currentSlug } = Astro.props;
+
+const tutorials = (await getCollection("tutorials")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+<nav aria-label="Tutorials" class="text-sm">
+  <p class="mb-2 font-semibold uppercase tracking-wide text-gray-500">
+    Tutorials
+  </p>
+  <ul class="space-y-1">
+    {tutorials.map((t) => (
+      <li>
+        <a
+          href={`/tutorials/${t.id}`}
+          class={
+            t.id === currentSlug
+              ? "font-semibold text-blue-600"
+              : "text-gray-700 hover:underline dark:text-gray-300"
+          }
+        >
+          {t.data.title}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
