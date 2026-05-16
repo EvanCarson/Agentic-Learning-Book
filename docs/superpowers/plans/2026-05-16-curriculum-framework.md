@@ -221,7 +221,7 @@ export function buildCurriculum(
   for (const l of lessons) {
     if (!byId.has(l.moduleId)) {
       throw new Error(
-        `Curriculum: lesson "${l.slug}" references unknown module "${l.moduleId}"`,
+        `Curriculum: unknown module "${l.moduleId}" referenced by lesson "${l.slug}"`,
       );
     }
   }
@@ -275,13 +275,30 @@ export function adjacent(curriculum: Curriculum, slug: string): Adjacent {
 Run: `npx vitest run tests/curriculum.test.ts`
 Expected: PASS — all tests green.
 
-- [ ] **Step 5: Remove the superseded navigation module + its tests**
+- [ ] **Step 5: Remove the superseded navigation module AND its consumers**
+
+> **Amendment (applied during execution):** The original plan removed only
+> `navigation.ts` + its test here and deferred deleting
+> `src/layouts/TutorialLayout.astro` and `src/pages/tutorials/[...slug].astro`
+> to Task 9. But those two files import `navigation.ts`, so removing it
+> alone breaks `astro check`/`build`. They are superseded anyway, so their
+> deletion is pulled forward into this step (Task 9 no longer deletes them).
+> The `tutorials` content collection, the tutorial MDX, and the
+> `/tutorials/...` href strings in `index.astro`/`Header.astro` remain
+> until Task 9 (a static build does not fail on internal dead links).
 
 ```bash
 git rm src/lib/navigation.ts tests/navigation.test.ts
+git rm src/pages/tutorials/[...slug].astro src/layouts/TutorialLayout.astro
+grep -rn "navigation\|TutorialLayout\|pages/tutorials" src/ || echo "no references"
 npx vitest run
+npx astro check
+npm run build
 ```
-Expected: vitest runs only `tests/curriculum.test.ts` (and any others), all PASS, no reference to navigation remains.
+Expected: `no references`; vitest runs only `tests/curriculum.test.ts`, all
+PASS; `astro check` 0/0/0; build succeeds with **1 page** (`/index.html`
+only — the old `/tutorials` route is gone and the tutorial MDX is now
+orphaned content with no page until Task 9).
 
 - [ ] **Step 6: Commit**
 
@@ -1087,11 +1104,14 @@ In `astro.config.mjs`, add a top-level `redirects` key to the `defineConfig({ ..
   },
 ```
 
-Then remove the superseded files:
+Then remove the remaining superseded content directory:
+
+> **Amendment:** `src/pages/tutorials/[...slug].astro` and
+> `src/layouts/TutorialLayout.astro` were already deleted in Task 2 Step 5
+> (they imported the removed `navigation.ts`). Do NOT re-`git rm` them here.
 
 ```bash
-git rm src/pages/tutorials/[...slug].astro src/layouts/TutorialLayout.astro
-rmdir src/content/tutorials 2>/dev/null || true
+git rm -r src/content/tutorials 2>/dev/null || true
 git add astro.config.mjs src/content.config.ts src/content/lessons src/pages/index.astro src/components/Header.astro
 ```
 
