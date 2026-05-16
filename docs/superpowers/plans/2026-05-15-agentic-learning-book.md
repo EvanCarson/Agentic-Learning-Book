@@ -106,6 +106,15 @@ git commit -m "chore: scaffold Astro 5 minimal site"
 
 ### Task 2: Add React, MDX, and Tailwind integrations
 
+> **Amendment (applied during execution):** The layouts use Tailwind Typography
+> `prose` classes, but the `prose` utilities ship in `@tailwindcss/typography`,
+> which `astro add tailwind` does NOT install. This was missed in the original
+> plan and caught in Task 8 review. Fix applied: `npm install -D
+> @tailwindcss/typography` and add `@plugin "@tailwindcss/typography";`
+> immediately after `@import "tailwindcss";` in `src/styles/global.css`
+> (Tailwind v4 CSS-first config; no `tailwind.config.*` needed). Verified by
+> confirming `.prose` rules are emitted into the built `dist/` CSS.
+
 **Files:**
 - Modify: `astro.config.mjs`, `package.json` (via `astro add`)
 - Create: `src/styles/global.css`
