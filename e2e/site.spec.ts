@@ -49,6 +49,18 @@ test.describe("tutorial page", () => {
   });
 
   test("PyRunner executes Python in-browser", async ({ page }) => {
+    test.setTimeout(180_000);
+
+    const consoleErrors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        consoleErrors.push(msg.text());
+      }
+    });
+    page.on("pageerror", (err) => {
+      consoleErrors.push(err.message);
+    });
+
     await page.goto("/tutorials/01-what-is-an-agent");
 
     // Find the Run button inside the PyRunner widget
@@ -58,21 +70,24 @@ test.describe("tutorial page", () => {
     // Click to trigger Pyodide load + execution
     await runButton.click();
 
-    // Wait for the aria-live output pre to appear with expected text
+    // Wait once for the LAST expected line (Pyodide CDN load can be slow)
     const outputPre = page.locator("pre[aria-live='polite']");
-
-    await expect(outputPre).toContainText("obs='unknown topic' -> action='search'", {
-      timeout: 90_000,
-    });
-    await expect(outputPre).toContainText("obs='known fact' -> action='answer'", {
-      timeout: 90_000,
-    });
     await expect(outputPre).toContainText("obs='unknown thing' -> action='search'", {
       timeout: 90_000,
     });
 
+    // Once the last line is present the full output is stable — assert the rest without extra timeout
+    await expect(outputPre).toContainText("obs='unknown topic' -> action='search'");
+    await expect(outputPre).toContainText("obs='known fact' -> action='answer'");
+
     // Button should be re-enabled after completion
     await expect(runButton).not.toBeDisabled({ timeout: 5_000 });
+
+    // No severe console errors during Pyodide load + run (ignore favicon 404s)
+    const severeErrors = consoleErrors.filter(
+      (msg) => !msg.includes("favicon") && !msg.includes("favicon.ico"),
+    );
+    expect(severeErrors, `Console errors: ${severeErrors.join("\n")}`).toHaveLength(0);
   });
 
   test("prev/next nav present", async ({ page }) => {
