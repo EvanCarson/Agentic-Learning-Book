@@ -163,6 +163,14 @@ git commit -m "chore: add react, mdx, tailwind integrations"
 
 ### Task 3: Add Vitest for unit testing
 
+> **Amendment (applied during execution):** The plan relied on `astro build`
+> as the type gate, but the Astro build is esbuild-transpile-only and does
+> NOT type-check. A real gate was added: `npm install -D @astrojs/check
+> typescript` plus a `"typecheck": "astro check"` script. Running it across
+> the whole codebase reported 0 errors / 0 warnings / 0 hints (after the
+> Task 4 zod amendment below). `astro check` is the authoritative type gate
+> for this project; `npm run build` alone is insufficient.
+
 **Files:**
 - Create: `vitest.config.ts`
 - Modify: `package.json` (test script)
@@ -212,6 +220,12 @@ git commit -m "chore: add vitest config and test script"
 ---
 
 ### Task 4: Define the tutorials content collection schema
+
+> **Amendment (applied during execution):** Importing `z` from
+> `astro:content` is deprecated in Astro 6 (`ts(6385)`, surfaced by the
+> `astro check` gate). Final form imports `defineCollection` from
+> `astro:content` and `z` from `zod` directly, with `zod` added as a regular
+> dependency. Schema/loader/export are otherwise unchanged.
 
 **Files:**
 - Create: `src/content.config.ts`
