@@ -4,9 +4,9 @@
 
 **Goal:** Scaffold a static-hostable interactive Astro site that teaches agentic AI via MDX tutorials, with one sample lesson containing a working in-browser Python runner (Pyodide).
 
-**Architecture:** Astro 5 static site. Tutorials are an MDX Content Collection validated by a typed schema at build time. Interactivity is added as React islands hydrated only where used. The Python runner is a client-side React island loading Pyodide (CPython→WASM) from CDN — no backend.
+**Architecture:** Astro 6 static site. Tutorials are an MDX Content Collection validated by a typed schema at build time. Interactivity is added as React islands hydrated only where used. The Python runner is a client-side React island loading Pyodide (CPython→WASM) from CDN — no backend.
 
-**Tech Stack:** Astro 5, `@astrojs/mdx`, `@astrojs/react`, React 18, Tailwind CSS v4 (Vite plugin), Pyodide (CDN), Vitest (unit test for nav helper), TypeScript (strict).
+**Tech Stack:** Astro 6, `@astrojs/mdx`, `@astrojs/react`, React 18, Tailwind CSS v4 (Vite plugin), Pyodide (CDN), Vitest (unit test for nav helper), TypeScript (strict). (Plan authored against Astro 5 APIs; Astro 6 is installed — the content layer / `render` APIs used here are stable across both.)
 
 Working directory: repo root `Agentic-Learning-Book/` (already contains `.git` and `docs/`).
 
@@ -21,7 +21,7 @@ tsconfig.json               strict
 vitest.config.ts            unit tests for pure helpers
 src/
   styles/global.css         tailwind import + base styles
-  content.config.ts         tutorials collection schema (Astro 5)
+  content.config.ts         tutorials collection schema (Astro 6)
   content/tutorials/
     01-what-is-an-agent.mdx  sample lesson, embeds <PyRunner>
   lib/
@@ -208,7 +208,7 @@ git commit -m "chore: add vitest config and test script"
 - Create: `src/content.config.ts`
 - Create: `src/content/tutorials/.gitkeep`
 
-- [ ] **Step 1: Create `src/content.config.ts` (Astro 5 content layer)**
+- [ ] **Step 1: Create `src/content.config.ts` (Astro 6 content layer)**
 
 ```typescript
 import { defineCollection, z } from "astro:content";
