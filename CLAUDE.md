@@ -104,8 +104,10 @@ CDN-blocked PyRunner test.
 - MDX normalizes the indentation of the `PyRunner` `code` template literal
   (4-space → 2-space, 8 → 6). Sample code still runs (consistent within
   blocks). A future fix: load snippet code from a raw-imported `.py` file.
-- In-browser Pyodide execution and visual rendering are **manual** checks —
-  not covered by automated build/typecheck/tests. See README.
+- In-browser Pyodide execution and visual rendering require a real browser
+  and a CDN-reachable environment — they are **not** exercised by
+  `build`/`typecheck`/unit tests alone, but ARE covered by the automated
+  **`npm run e2e`** gate (headless Chromium + live PyRunner assertion).
 
 ## Adding a tutorial
 
