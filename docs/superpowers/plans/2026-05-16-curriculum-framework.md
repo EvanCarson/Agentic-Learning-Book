@@ -186,6 +186,13 @@ Expected: FAIL — cannot resolve `../src/lib/curriculum`.
 
 - [ ] **Step 3: Write the implementation**
 
+> **Amendment (applied during execution):** `buildCurriculum` also rejects
+> globally-duplicate lesson `slug`s (slug is the route key; duplicates
+> silently corrupt the sequence). A `Set<string>` slug check throwing
+> `Curriculum: duplicate lesson slug "<slug>"` runs at the start of
+> `buildCurriculum`, with a matching unit test. Coverage also includes a
+> single-lesson curriculum adjacency case (both prev/next null).
+
 Create `src/lib/curriculum.ts`:
 
 ```ts
@@ -943,8 +950,16 @@ git commit -m "feat: add LessonLayout and /learn/[...slug] route"
 - Create: `src/content/lessons/02-agent-anatomy.mdx`
 - Create: `src/content/lessons/03-foundations-check.mdx`
 - Create: `src/content/lessons/04-tool-use.mdx`
-- Modify: `src/pages/index.astro`, `src/components/Header.astro`, `astro.config.mjs`
-- Delete: `src/content/tutorials/`, `src/layouts/TutorialLayout.astro`, `src/pages/tutorials/[...slug].astro`
+- Modify: `src/pages/index.astro`, `src/components/Header.astro`, `astro.config.mjs`, `CLAUDE.md`
+- Delete: `src/content/tutorials/` (TutorialLayout.astro and the tutorials route were already deleted in Task 2 — see amendment there)
+
+> **Amendment:** This task must also refresh `CLAUDE.md`'s Architecture
+> and "Adding a tutorial" sections — they still describe the removed
+> `navigation.ts`, `TutorialLayout.astro`, the `/tutorials` route, and
+> `getAdjacentTutorials`. Update them to the curriculum model
+> (`modules.ts`, `curriculum.ts`, `LessonLayout`, `/learn` routes,
+> `lessons` collection schema, the progress store) so the agent-guidance
+> file matches reality.
 
 - [ ] **Step 1: Replace `src/content.config.ts`**
 
