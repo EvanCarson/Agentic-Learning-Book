@@ -23,6 +23,26 @@ npm run preview    # serve dist/ (run build first)
 Always run `npm run typecheck` (`astro check`) for type validation — it is
 the real gate. CI/verification must run all three: test, typecheck, build.
 
+## Definition of Done
+
+Work is **NOT done** until UI testing has been performed. Build,
+typecheck, and unit tests passing is necessary but **not sufficient** —
+they do not exercise the rendered UI or the in-browser Pyodide runtime.
+
+Before any change is considered complete, UI testing must verify, in a
+real browser (or headless browser automation):
+
+1. The landing page and tutorial pages render correctly (layout, Tailwind
+   styles applied, no console errors).
+2. The `PyRunner` widget loads Pyodide, executes the sample Python on
+   **Run**, and displays the expected output.
+3. Navigation works (sidebar links, prev/next, active-link highlighting).
+
+Server-up / HTTP-200 / HTML-content smoke tests do **not** satisfy this —
+they do not load WASM, run JavaScript, or render styles. Until automated
+browser UI tests exist, this check is **manual and mandatory**; record
+that it was performed and its result before claiming completion.
+
 ## Architecture
 
 - **Stack:** Astro 6 (static), React 19 islands, Tailwind v4 (`@tailwindcss/vite`
