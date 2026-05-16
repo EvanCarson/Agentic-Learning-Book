@@ -7,7 +7,9 @@ export default function SyllabusView({
   curriculum: Curriculum;
 }) {
   const { isComplete, lastVisited } = useProgress();
-  const last = lastVisited();
+  const knownSlugs = new Set(curriculum.sequence.map((l) => l.slug));
+  const rawLast = lastVisited();
+  const last = rawLast && knownSlugs.has(rawLast) ? rawLast : null;
   const firstIncomplete = curriculum.sequence.find((l) => !isComplete(l.slug));
   const continueSlug = last ?? firstIncomplete?.slug ?? curriculum.sequence[0]?.slug;
 
@@ -26,22 +28,24 @@ export default function SyllabusView({
           <h2 className="text-2xl font-bold">{m.title}</h2>
           <p className="mt-1 text-gray-600 dark:text-gray-400">{m.summary}</p>
           <ul className="mt-4 space-y-2">
-            {m.lessons.map((l) => (
-              <li key={l.slug}>
-                <a
-                  href={`/learn/${l.slug}`}
-                  className="flex items-center gap-3 rounded border border-gray-200 p-3 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
-                >
-                  <span aria-hidden="true">
-                    {isComplete(l.slug) ? "✓" : "○"}
-                  </span>
-                  <span className="font-medium">{l.title}</span>
-                  <span className="ml-auto text-xs uppercase tracking-wide text-gray-500">
-                    {l.type} · {l.estMinutes} min
-                  </span>
-                </a>
-              </li>
-            ))}
+            {m.lessons.map((l) => {
+              const done = isComplete(l.slug);
+              return (
+                <li key={l.slug}>
+                  <a
+                    href={`/learn/${l.slug}`}
+                    className="flex items-center gap-3 rounded border border-gray-200 p-3 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
+                  >
+                    <span aria-hidden="true">{done ? "✓" : "○"}</span>
+                    <span className="font-medium">{l.title}</span>
+                    {done && <span className="sr-only"> (completed)</span>}
+                    <span className="ml-auto text-xs uppercase tracking-wide text-gray-500">
+                      {l.type} · {l.estMinutes} min
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ))}
