@@ -1,0 +1,34 @@
+---
+import { getCollection, render } from "astro:content";
+import LessonLayout from "../../layouts/LessonLayout.astro";
+import { buildCurriculum, adjacent, type LessonMeta } from "../../lib/curriculum";
+import { modules } from "../../content/modules";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("lessons");
+  const lessons: LessonMeta[] = entries.map((e) => ({
+    slug: e.id,
+    moduleId: e.data.moduleId,
+    order: e.data.order,
+    type: e.data.type,
+    title: e.data.title,
+    summary: e.data.summary,
+    estMinutes: e.data.estMinutes,
+  }));
+  const curriculum = buildCurriculum(modules, lessons);
+  return entries.map((entry) => {
+    const lesson = lessons.find((l) => l.slug === entry.id)!;
+    return {
+      params: { slug: entry.id },
+      props: { entry, lesson, curriculum, adjacent: adjacent(curriculum, entry.id) },
+    };
+  });
+}
+
+type Props = Awaited<ReturnType<typeof getStaticPaths>>[number]["props"];
+const { entry, lesson, curriculum, adjacent: adj } = Astro.props as Props;
+const { Content } = await render(entry);
+---
+<LessonLayout lesson={lesson} curriculum={curriculum} adjacent={adj}>
+  <Content />
+</LessonLayout>
