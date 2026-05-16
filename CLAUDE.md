@@ -11,12 +11,16 @@ any static host.
 
 ## Deployment
 
-Static deploy to Vercel, configured by `vercel.json` (no SSR adapter —
-the site is fully static). Push-to-deploy when the repo is git-connected
-in Vercel. Vercel only runs `npm run build`; it does NOT run the
-test/typecheck/e2e gates — those must pass in CI or locally before
-deploying (see Definition of Done). `dist/` is also hostable on any
-static host.
+**Live:** https://agentic-learning-ruddy.vercel.app — git-connected to
+Vercel. Push to `main` → production; PRs/branches → preview deployments.
+Verified working in production (pages render, PyRunner runs Python).
+
+Configured by `vercel.json` (no SSR adapter — fully static); `dist/` is
+also hostable on any static host. **Critical caveat:** Vercel only runs
+`npm run build`. It does NOT run the test/typecheck/e2e gates, and there
+is no GitHub Actions workflow — so the Definition-of-Done gates are
+**local-only** and MUST be run manually before merging to `main`. A
+buildable-but-broken change will otherwise deploy.
 
 ## Commands
 

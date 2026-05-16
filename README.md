@@ -3,6 +3,8 @@
 An interactive web app teaching agentic AI. Tutorials are MDX; the Python
 code runs entirely in your browser via Pyodide (no backend).
 
+**Live:** https://agentic-learning-ruddy.vercel.app
+
 ## Develop
 
 ```bash
@@ -60,7 +62,9 @@ import PyRunner from "../../components/PyRunner.tsx";
 
 ## Manual verification (Pyodide runtime)
 
-Automated coverage is `npm run e2e`. To check by hand instead:
+Automated coverage is `npm run e2e`. Quickest manual check: open the live
+site at https://agentic-learning-ruddy.vercel.app/tutorials/01-what-is-an-agent
+and press **Run**. To check a local build instead:
 
 ```bash
 npm run build    # required before preview — serves dist/
@@ -78,20 +82,22 @@ obs='unknown thing' -> action='search'
 
 ## Deploy (Vercel)
 
-This site is fully static and configured for Vercel via `vercel.json`
-(framework `astro`, build `npm run build`, output `dist/`, install
-`npm ci`). No serverless adapter is used.
+**Live and git-connected.** The repo is connected to Vercel: every push
+to `main` deploys to production (https://agentic-learning-ruddy.vercel.app),
+and PRs/branches get preview deployments automatically. Verified in
+production: pages render and the in-browser PyRunner executes Python
+correctly.
 
-**Git-connected (recommended):** Import the repo at vercel.com → New
-Project. Vercel reads `vercel.json`; every push to the default branch
-deploys to production, and other branches/PRs get preview deployments.
+Configured via `vercel.json` (framework `astro`, build `npm run build`,
+output `dist/`, install `npm ci`). Fully static — no serverless adapter.
+**CLI alternative:** `npm i -g vercel`, then `vercel` / `vercel --prod`.
 
-**CLI:** `npm i -g vercel`, then `vercel` (preview) or `vercel --prod`.
+> **CI caveat:** Vercel's pipeline only runs `npm run build`. It does
+> **not** run the mandatory gates (`npm test`, `npm run typecheck`,
+> `npm run e2e` — see CLAUDE.md "Definition of Done"). There is no
+> GitHub Actions workflow enforcing them, so these gates are
+> **local-only**: run them before merging to `main`, or a buildable-but-
+> broken change can ship.
 
-`vercel.json` pins the build so local and Vercel builds match. The
-mandatory `npm run e2e` UI gate (see CLAUDE.md "Definition of Done") is
-NOT run by Vercel's build — run it in CI or locally before deploying.
-
-Being served at a domain root, the existing absolute links work as-is
-(no `base` path needed). The build output (`dist/`) is also hostable on
-any other static host.
+Served at a domain root, so absolute links work as-is (no `base` path).
+The build output (`dist/`) is also hostable on any static host.
