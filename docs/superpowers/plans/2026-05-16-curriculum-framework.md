@@ -654,6 +654,10 @@ git commit -m "feat: add QuizStub and MarkComplete islands"
 
 ### Task 6: SidebarNav island + Sidebar.astro
 
+> **Amendment (review):** each completed lesson link also renders a
+> visually-hidden `<span className="sr-only"> (completed)</span>` so screen
+> readers announce completion state (the ✓/○ glyph stays `aria-hidden`).
+
 **Files:**
 - Create: `src/components/SidebarNav.tsx`
 - Delete + recreate: `src/components/Sidebar.astro`
