@@ -27,3 +27,9 @@ pnpm-debug.log*
 
 # astro scaffold temp dir
 .astro-tmp/
+
+# Playwright artifacts
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
