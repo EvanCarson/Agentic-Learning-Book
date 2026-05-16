@@ -33,3 +33,6 @@ pnpm-debug.log*
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Vercel CLI (project link + local build output)
+.vercel
