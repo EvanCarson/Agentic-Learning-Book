@@ -1,13 +1,13 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import Sidebar from "../components/Sidebar.astro";
-import type { NavEntry } from "../lib/navigation";
+import type { LessonMeta } from "../lib/curriculum";
 
 interface Props {
   title: string;
   slug: string;
-  prev: NavEntry | null;
-  next: NavEntry | null;
+  prev: LessonMeta | null;
+  next: LessonMeta | null;
 }
 const { title, slug, prev, next } = Astro.props;
 ---

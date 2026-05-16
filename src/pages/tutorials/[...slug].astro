@@ -1,17 +1,26 @@
 ---
 import { getCollection, render } from "astro:content";
 import TutorialLayout from "../../layouts/TutorialLayout.astro";
-import { getAdjacentTutorials, type NavEntry } from "../../lib/navigation";
+import { buildCurriculum, adjacent, type LessonMeta } from "../../lib/curriculum";
+import { modules } from "../../content/modules";
 
 export async function getStaticPaths() {
   const tutorials = await getCollection("tutorials");
-  const navEntries: NavEntry[] = tutorials.map((t) => ({
+  const lessons: LessonMeta[] = tutorials.map((t) => ({
     slug: t.id,
-    title: t.data.title,
+    moduleId: "foundations",
     order: t.data.order,
+    type: "reading" as const,
+    title: t.data.title,
+    summary: t.data.summary,
+    estMinutes: 5,
   }));
+  // Build curriculum only from modules that have lessons
+  const usedModuleIds = new Set(lessons.map((l) => l.moduleId));
+  const usedModules = modules.filter((m) => usedModuleIds.has(m.id));
+  const curriculum = buildCurriculum(usedModules, lessons);
   return tutorials.map((entry) => {
-    const { prev, next } = getAdjacentTutorials(navEntries, entry.id);
+    const { prev, next } = adjacent(curriculum, entry.id);
     return {
       params: { slug: entry.id },
       props: { entry, prev, next },
