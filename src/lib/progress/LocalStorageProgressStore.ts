@@ -1,4 +1,5 @@
 import type { ProgressStore } from "./ProgressStore";
+import { PROGRESS_CHANGED_EVENT } from "./ProgressStore";
 
 const KEY = "alb:progress";
 
@@ -14,6 +15,7 @@ function emptyShape(): Shape {
 export function createLocalStorageProgressStore(
   backing?: Storage,
 ): ProgressStore {
+  // globalThis for storage detection (SSR/Workers-safe); window is only touched for DOM events in write().
   const storage: Storage | null =
     backing ??
     (typeof globalThis !== "undefined" &&
@@ -27,7 +29,7 @@ export function createLocalStorageProgressStore(
     if (!storage) return memory;
     try {
       const raw = storage.getItem(KEY);
-      if (!raw) return memory;
+      if (!raw) return emptyShape();
       const parsed = JSON.parse(raw) as Partial<Shape>;
       return {
         completed: parsed.completed ?? {},
@@ -44,7 +46,7 @@ export function createLocalStorageProgressStore(
     try {
       storage.setItem(KEY, JSON.stringify(next));
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("alb:progress-changed"));
+        window.dispatchEvent(new Event(PROGRESS_CHANGED_EVENT));
       }
     } catch {
       /* memory already updated; ignore */
