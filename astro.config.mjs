@@ -9,6 +9,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   integrations: [react(), mdx()],
 
+  redirects: {
+    "/tutorials/[...slug]": "/learn/[...slug]",
+  },
+
   vite: {
     plugins: [tailwindcss()]
   }
