@@ -1,0 +1,29 @@
+---
+title: "What Is an Agent?"
+order: 1
+summary: "The perceive–decide–act loop, run in your browser."
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+An **agent** is a system that repeatedly *perceives* its environment,
+*decides* what to do, and *acts* — then observes the result and loops again.
+
+The simplest possible agent is just that loop. Edit the code below and
+press **Run** — this executes real Python in your browser, no server.
+
+<PyRunner client:visible code={`def decide(observation):
+    # a trivial policy: search if we don't know the answer
+    if "unknown" in observation:
+        return "search"
+    return "answer"
+
+def agent_loop(observations):
+    for obs in observations:
+        action = decide(obs)
+        print(f"obs={obs!r} -> action={action!r}")
+
+agent_loop(["unknown topic", "known fact", "unknown thing"])
+`} />
+
+Next, we'll give this agent **tools** so its actions can affect the world.
