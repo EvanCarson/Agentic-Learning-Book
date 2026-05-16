@@ -1,0 +1,8 @@
+---
+import SyllabusView from "./SyllabusView.tsx";
+import type { Curriculum } from "../lib/curriculum";
+
+interface Props { curriculum: Curriculum }
+const { curriculum } = Astro.props;
+---
+<SyllabusView client:load curriculum={curriculum} />
