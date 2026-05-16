@@ -514,10 +514,16 @@ A React hook giving islands a live view of the store, re-rendering on the custom
 > `./ProgressStore` — import and use it instead of the literal string so
 > the dispatcher and this listener cannot drift apart.
 
+> **Amendment 2 (Task 4 review):** the cross-tab `storage` listener is
+> filtered to the progress key so unrelated localStorage writes don't
+> force re-renders. The key is the shared `PROGRESS_STORAGE_KEY` constant
+> (also exported from `./ProgressStore` and used by
+> `LocalStorageProgressStore`, replacing its private `KEY`).
+
 ```ts
 import { useCallback, useEffect, useState } from "react";
 import { createLocalStorageProgressStore } from "./LocalStorageProgressStore";
-import { PROGRESS_CHANGED_EVENT } from "./ProgressStore";
+import { PROGRESS_CHANGED_EVENT, PROGRESS_STORAGE_KEY } from "./ProgressStore";
 
 const store = createLocalStorageProgressStore();
 
@@ -525,7 +531,16 @@ export function useProgress() {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    const bump = () => setTick((t) => t + 1);
+    const bump = (e?: Event) => {
+      if (
+        e instanceof StorageEvent &&
+        e.key !== null &&
+        e.key !== PROGRESS_STORAGE_KEY
+      ) {
+        return;
+      }
+      setTick((t) => t + 1);
+    };
     window.addEventListener(PROGRESS_CHANGED_EVENT, bump);
     window.addEventListener("storage", bump);
     return () => {
