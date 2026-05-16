@@ -4,9 +4,9 @@
 
 **Goal:** Scaffold a static-hostable interactive Astro site that teaches agentic AI via MDX tutorials, with one sample lesson containing a working in-browser Python runner (Pyodide).
 
-**Architecture:** Astro 5 static site. Tutorials are an MDX Content Collection validated by a typed schema at build time. Interactivity is added as React islands hydrated only where used. The Python runner is a client-side React island loading Pyodide (CPython→WASM) from CDN — no backend.
+**Architecture:** Astro 6 static site. Tutorials are an MDX Content Collection validated by a typed schema at build time. Interactivity is added as React islands hydrated only where used. The Python runner is a client-side React island loading Pyodide (CPython→WASM) from CDN — no backend.
 
-**Tech Stack:** Astro 5, `@astrojs/mdx`, `@astrojs/react`, React 18, Tailwind CSS v4 (Vite plugin), Pyodide (CDN), Vitest (unit test for nav helper), TypeScript (strict).
+**Tech Stack:** Astro 6, `@astrojs/mdx`, `@astrojs/react`, React 19, Tailwind CSS v4 (Vite plugin), Pyodide (CDN), Vitest (unit test for nav helper), TypeScript (strict). (Plan authored against Astro 5 / React 18 APIs; Astro 6 + React 19 are what the resolver installed — the content layer / `render` APIs and the `useState`/`useRef` hooks used here are stable across those versions.)
 
 Working directory: repo root `Agentic-Learning-Book/` (already contains `.git` and `docs/`).
 
@@ -21,7 +21,7 @@ tsconfig.json               strict
 vitest.config.ts            unit tests for pure helpers
 src/
   styles/global.css         tailwind import + base styles
-  content.config.ts         tutorials collection schema (Astro 5)
+  content.config.ts         tutorials collection schema (Astro 6)
   content/tutorials/
     01-what-is-an-agent.mdx  sample lesson, embeds <PyRunner>
   lib/
@@ -106,6 +106,15 @@ git commit -m "chore: scaffold Astro 5 minimal site"
 
 ### Task 2: Add React, MDX, and Tailwind integrations
 
+> **Amendment (applied during execution):** The layouts use Tailwind Typography
+> `prose` classes, but the `prose` utilities ship in `@tailwindcss/typography`,
+> which `astro add tailwind` does NOT install. This was missed in the original
+> plan and caught in Task 8 review. Fix applied: `npm install -D
+> @tailwindcss/typography` and add `@plugin "@tailwindcss/typography";`
+> immediately after `@import "tailwindcss";` in `src/styles/global.css`
+> (Tailwind v4 CSS-first config; no `tailwind.config.*` needed). Verified by
+> confirming `.prose` rules are emitted into the built `dist/` CSS.
+
 **Files:**
 - Modify: `astro.config.mjs`, `package.json` (via `astro add`)
 - Create: `src/styles/global.css`
@@ -153,6 +162,14 @@ git commit -m "chore: add react, mdx, tailwind integrations"
 ---
 
 ### Task 3: Add Vitest for unit testing
+
+> **Amendment (applied during execution):** The plan relied on `astro build`
+> as the type gate, but the Astro build is esbuild-transpile-only and does
+> NOT type-check. A real gate was added: `npm install -D @astrojs/check
+> typescript` plus a `"typecheck": "astro check"` script. Running it across
+> the whole codebase reported 0 errors / 0 warnings / 0 hints (after the
+> Task 4 zod amendment below). `astro check` is the authoritative type gate
+> for this project; `npm run build` alone is insufficient.
 
 **Files:**
 - Create: `vitest.config.ts`
@@ -204,11 +221,17 @@ git commit -m "chore: add vitest config and test script"
 
 ### Task 4: Define the tutorials content collection schema
 
+> **Amendment (applied during execution):** Importing `z` from
+> `astro:content` is deprecated in Astro 6 (`ts(6385)`, surfaced by the
+> `astro check` gate). Final form imports `defineCollection` from
+> `astro:content` and `z` from `zod` directly, with `zod` added as a regular
+> dependency. Schema/loader/export are otherwise unchanged.
+
 **Files:**
 - Create: `src/content.config.ts`
 - Create: `src/content/tutorials/.gitkeep`
 
-- [ ] **Step 1: Create `src/content.config.ts` (Astro 5 content layer)**
+- [ ] **Step 1: Create `src/content.config.ts` (Astro 6 content layer)**
 
 ```typescript
 import { defineCollection, z } from "astro:content";

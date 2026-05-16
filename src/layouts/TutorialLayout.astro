@@ -1,0 +1,32 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import type { NavEntry } from "../lib/navigation";
+
+interface Props {
+  title: string;
+  slug: string;
+  prev: NavEntry | null;
+  next: NavEntry | null;
+}
+const { title, slug, prev, next } = Astro.props;
+---
+<BaseLayout title={title}>
+  <div class="grid grid-cols-1 gap-8 md:grid-cols-[14rem_1fr]">
+    <aside class="md:border-r md:border-gray-200 md:pr-4 md:dark:border-gray-800">
+      <Sidebar currentSlug={slug} />
+    </aside>
+    <article class="prose max-w-none dark:prose-invert">
+      <h1>{title}</h1>
+      <slot />
+      <nav aria-label="Tutorial navigation" class="mt-12 flex justify-between border-t border-gray-200 pt-4 text-sm dark:border-gray-800">
+        {prev ? (
+          <a href={`/tutorials/${prev.slug}`}>&larr; {prev.title}</a>
+        ) : <span />}
+        {next ? (
+          <a href={`/tutorials/${next.slug}`}>{next.title} &rarr;</a>
+        ) : <span />}
+      </nav>
+    </article>
+  </div>
+</BaseLayout>
