@@ -1,7 +1,5 @@
 import type { ProgressStore } from "./ProgressStore";
-import { PROGRESS_CHANGED_EVENT } from "./ProgressStore";
-
-const KEY = "alb:progress";
+import { PROGRESS_CHANGED_EVENT, PROGRESS_STORAGE_KEY } from "./ProgressStore";
 
 interface Shape {
   completed: Record<string, boolean>;
@@ -28,7 +26,7 @@ export function createLocalStorageProgressStore(
   function read(): Shape {
     if (!storage) return memory;
     try {
-      const raw = storage.getItem(KEY);
+      const raw = storage.getItem(PROGRESS_STORAGE_KEY);
       if (!raw) return emptyShape();
       const parsed = JSON.parse(raw) as Partial<Shape>;
       return {
@@ -44,7 +42,7 @@ export function createLocalStorageProgressStore(
     memory = next;
     if (!storage) return;
     try {
-      storage.setItem(KEY, JSON.stringify(next));
+      storage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(next));
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event(PROGRESS_CHANGED_EVENT));
       }

@@ -5,6 +5,9 @@
  */
 export const PROGRESS_CHANGED_EVENT = "alb:progress-changed";
 
+/** localStorage key under which progress is persisted. */
+export const PROGRESS_STORAGE_KEY = "alb:progress";
+
 /**
  * Swappable progress persistence seam. This slice ships a synchronous
  * localStorage implementation. A future Supabase implementation MUST keep
