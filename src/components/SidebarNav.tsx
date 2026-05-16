@@ -34,6 +34,9 @@ export default function SidebarNav({
                       {isComplete(l.slug) ? "✓ " : "○ "}
                     </span>
                     {l.title}
+                    {isComplete(l.slug) && (
+                      <span className="sr-only"> (completed)</span>
+                    )}
                   </a>
                 </li>
               );
