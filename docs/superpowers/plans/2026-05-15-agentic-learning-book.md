@@ -6,7 +6,7 @@
 
 **Architecture:** Astro 6 static site. Tutorials are an MDX Content Collection validated by a typed schema at build time. Interactivity is added as React islands hydrated only where used. The Python runner is a client-side React island loading Pyodide (CPython→WASM) from CDN — no backend.
 
-**Tech Stack:** Astro 6, `@astrojs/mdx`, `@astrojs/react`, React 18, Tailwind CSS v4 (Vite plugin), Pyodide (CDN), Vitest (unit test for nav helper), TypeScript (strict). (Plan authored against Astro 5 APIs; Astro 6 is installed — the content layer / `render` APIs used here are stable across both.)
+**Tech Stack:** Astro 6, `@astrojs/mdx`, `@astrojs/react`, React 19, Tailwind CSS v4 (Vite plugin), Pyodide (CDN), Vitest (unit test for nav helper), TypeScript (strict). (Plan authored against Astro 5 / React 18 APIs; Astro 6 + React 19 are what the resolver installed — the content layer / `render` APIs and the `useState`/`useRef` hooks used here are stable across those versions.)
 
 Working directory: repo root `Agentic-Learning-Book/` (already contains `.git` and `docs/`).
 
