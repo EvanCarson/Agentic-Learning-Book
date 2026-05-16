@@ -748,6 +748,12 @@ git commit -m "feat: progress-reactive SidebarNav island grouped by module"
 
 ### Task 7: SyllabusView island + Syllabus.astro + /learn index
 
+> **Amendment (review):** SyllabusView also (1) renders an `sr-only`
+> ` (completed)` span on completed lessons (SR parity with SidebarNav),
+> (2) dedupes `isComplete` via a `done` local in the lesson map, and
+> (3) ignores a `lastVisited` slug not present in the current curriculum
+> (`knownSlugs` guard) so the Continue link can't 404.
+
 **Files:**
 - Create: `src/components/SyllabusView.tsx`
 - Create: `src/components/Syllabus.astro`
