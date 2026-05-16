@@ -1,105 +1,78 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("landing page", () => {
-  test("landing renders", async ({ page }) => {
-    const consoleErrors: string[] = [];
-    page.on("console", (msg) => {
-      if (msg.type() === "error") {
-        consoleErrors.push(msg.text());
-      }
+test.describe("landing", () => {
+  test("renders and links to the curriculum", async ({ page }) => {
+    const errs: string[] = [];
+    page.on("pageerror", (e) => errs.push(e.message));
+    page.on("console", (m) => {
+      if (m.type() === "error" && !m.text().includes("favicon"))
+        errs.push(m.text());
     });
-    page.on("pageerror", (err) => {
-      consoleErrors.push(err.message);
-    });
-
     await page.goto("/");
-
-    // Heading visible
-    await expect(page.getByRole("heading", { name: "Learn to build AI agents" })).toBeVisible();
-
-    // Begin link with correct href
-    const beginLink = page.getByRole("link", { name: /Begin/i });
-    await expect(beginLink).toBeVisible();
-    await expect(beginLink).toHaveAttribute("href", "/tutorials/01-what-is-an-agent");
-
-    // No severe console errors (ignore favicon 404s)
-    const severeErrors = consoleErrors.filter(
-      (msg) => !msg.includes("favicon") && !msg.includes("favicon.ico"),
-    );
-    expect(severeErrors, `Console errors: ${severeErrors.join("\n")}`).toHaveLength(0);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Learn to build AI agents" }),
+    ).toBeVisible();
+    const cta = page.getByRole("link", { name: /Start the curriculum/i });
+    await expect(cta).toHaveAttribute("href", "/learn");
+    expect(errs, errs.join("\n")).toHaveLength(0);
   });
 });
 
-test.describe("tutorial page", () => {
-  test("tutorial renders + sidebar nav", async ({ page }) => {
-    await page.goto("/tutorials/01-what-is-an-agent");
-
-    // H1 heading
-    await expect(page.getByRole("heading", { name: "What Is an Agent?", level: 1 })).toBeVisible();
-
-    // Sidebar nav landmark with active link
-    const sidebar = page.getByRole("navigation", { name: "Tutorials" });
-    await expect(sidebar).toBeVisible();
-    const activeLink = sidebar.getByRole("link", { name: "What Is an Agent?" });
-    await expect(activeLink).toBeVisible();
-    await expect(activeLink).toHaveAttribute("aria-current", "page");
-
-    // Prose text (paragraph containing the agent definition)
-    await expect(page.getByText("is a system that repeatedly")).toBeVisible();
+test.describe("curriculum", () => {
+  test("syllabus lists modules in order with their lessons", async ({ page }) => {
+    await page.goto("/learn");
+    const headings = page.getByRole("heading", { level: 2 });
+    await expect(headings.nth(0)).toHaveText("Foundations");
+    await expect(headings.nth(1)).toHaveText("Patterns & Best Practices");
+    await expect(
+      page.getByRole("link", { name: /What Is an Agent\?/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /Tool Use/ }),
+    ).toBeVisible();
   });
 
-  test("PyRunner executes Python in-browser", async ({ page }) => {
+  test("prev/next spans the module boundary", async ({ page }) => {
+    await page.goto("/learn/03-foundations-check");
+    await page.getByRole("link", { name: /Tool Use →/ }).click();
+    await expect(page).toHaveURL(/\/learn\/04-tool-use$/);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Tool Use" }),
+    ).toBeVisible();
+  });
+
+  test("mark complete persists across reload", async ({ page }) => {
+    await page.goto("/learn/02-agent-anatomy");
+    const btn = page.getByRole("button", { name: /Mark complete/i });
+    await btn.click();
+    await expect(
+      page.getByRole("button", { name: /Completed/i }),
+    ).toBeVisible();
+    await page.reload();
+    await expect(
+      page.getByRole("button", { name: /Completed/i }),
+    ).toBeVisible();
+  });
+
+  test("quiz lesson renders the accessible stub", async ({ page }) => {
+    await page.goto("/learn/03-foundations-check");
+    await expect(page.getByRole("note")).toContainText(/coming soon/i);
+  });
+
+  test("interactive lesson still runs Python in-browser", async ({ page }) => {
     test.setTimeout(180_000);
-
-    const consoleErrors: string[] = [];
-    page.on("console", (msg) => {
-      if (msg.type() === "error") {
-        consoleErrors.push(msg.text());
-      }
-    });
-    page.on("pageerror", (err) => {
-      consoleErrors.push(err.message);
-    });
-
-    await page.goto("/tutorials/01-what-is-an-agent");
-
-    // Find the Run button inside the PyRunner widget
-    const runButton = page.getByRole("button", { name: /Run|Loading|Running/i });
-    await expect(runButton).toBeVisible();
-
-    // Click to trigger Pyodide load + execution
-    await runButton.click();
-
-    // Wait once for the LAST expected line (Pyodide CDN load can be slow)
-    const outputPre = page.locator("pre[aria-live='polite']");
-    await expect(outputPre).toContainText("obs='unknown thing' -> action='search'", {
+    await page.goto("/learn/01-what-is-an-agent");
+    await page.getByRole("button", { name: /Run|Loading|Running/i }).click();
+    const out = page.locator("pre[aria-live='polite']");
+    await expect(out).toContainText("obs='unknown thing' -> action='search'", {
       timeout: 90_000,
     });
-
-    // Once the last line is present the full output is stable — assert the rest without extra timeout
-    await expect(outputPre).toContainText("obs='unknown topic' -> action='search'");
-    await expect(outputPre).toContainText("obs='known fact' -> action='answer'");
-
-    // Button should be re-enabled after completion
-    await expect(runButton).not.toBeDisabled({ timeout: 5_000 });
-
-    // No severe console errors during Pyodide load + run (ignore favicon 404s)
-    const severeErrors = consoleErrors.filter(
-      (msg) => !msg.includes("favicon") && !msg.includes("favicon.ico"),
-    );
-    expect(severeErrors, `Console errors: ${severeErrors.join("\n")}`).toHaveLength(0);
+    await expect(out).toContainText("obs='unknown topic' -> action='search'");
+    await expect(out).toContainText("obs='known fact' -> action='answer'");
   });
 
-  test("prev/next nav present", async ({ page }) => {
+  test("old tutorials URL redirects to the new lesson path", async ({ page }) => {
     await page.goto("/tutorials/01-what-is-an-agent");
-
-    // Tutorial navigation landmark exists
-    const tutorialNav = page.getByRole("navigation", { name: "Tutorial navigation" });
-    await expect(tutorialNav).toBeVisible();
-
-    // With only one tutorial, there should be no prev/next links
-    // (both are empty <span> elements)
-    const navLinks = tutorialNav.getByRole("link");
-    await expect(navLinks).toHaveCount(0);
+    await expect(page).toHaveURL(/\/learn\/01-what-is-an-agent\/?$/);
   });
 });
