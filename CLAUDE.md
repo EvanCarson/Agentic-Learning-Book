@@ -5,7 +5,7 @@ Guidance for working in this repository.
 ## Project
 
 Agentic Learning Book — a static, interactive web app teaching agentic AI.
-Tutorials are MDX; Python snippets run **entirely in the browser** via
+Lessons are MDX; Python snippets run **entirely in the browser** via
 Pyodide (CPython→WASM). No backend, no accounts, no database. Deployable to
 any static host.
 
@@ -133,3 +133,10 @@ The lesson auto-appears in the sidebar and syllabus, ordered by module then
 `order`, and gets a `/learn/NN-slug` route. For interactive lessons, embed
 `<PyRunner client:visible code={`...`} />` — use pure-Python snippets
 (no network/`pip`) so they run in Pyodide.
+
+> Caveats: a `moduleId` not present in `src/content/modules.ts` is **not**
+> caught by `npm run typecheck` — it fails at `npm run build` (the
+> integrity check runs in `getStaticPaths`). For `type: "quiz"` lessons,
+> the MDX body is intentionally suppressed: `LessonLayout` renders
+> `QuizStub` instead of the lesson body, so prose in a quiz `.mdx` file
+> will not be shown.

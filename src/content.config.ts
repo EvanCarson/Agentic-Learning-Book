@@ -7,7 +7,7 @@ const lessons = defineCollection({
   schema: z.object({
     title: z.string(),
     moduleId: z.string(),
-    order: z.number().int().nonnegative(),
+    order: z.number().int().positive(),
     type: z.enum(["reading", "interactive", "quiz"]),
     summary: z.string(),
     estMinutes: z.number().int().positive(),
