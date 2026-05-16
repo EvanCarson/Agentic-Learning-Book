@@ -26,7 +26,7 @@ buildable-but-broken change will otherwise deploy.
 
 ```bash
 npm run dev        # dev server, http://localhost:4321
-npm test           # Vitest unit tests (navigation helper)
+npm test           # Vitest unit tests (curriculum + progress store)
 npm run typecheck  # astro check — AUTHORITATIVE type gate
 npm run build      # static build -> dist/ (validates content schema)
 npm run preview    # serve dist/ (run build first)
