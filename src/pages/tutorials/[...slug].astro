@@ -19,7 +19,9 @@ export async function getStaticPaths() {
   });
 }
 
-const { entry, prev, next } = Astro.props;
+type Props = Awaited<ReturnType<typeof getStaticPaths>>[number]["props"];
+
+const { entry, prev, next } = Astro.props as Props;
 const { Content } = await render(entry);
 ---
 <TutorialLayout
