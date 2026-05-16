@@ -17,7 +17,10 @@ function loadScript(src: string): Promise<void> {
     const s = document.createElement("script");
     s.src = src;
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error(`Failed to load ${src}`));
+    s.onerror = () => {
+      s.remove();
+      reject(new Error(`Failed to load ${src}`));
+    };
     document.head.appendChild(s);
   });
 }
@@ -59,6 +62,7 @@ export default function PyRunner({ code }: { code: string }) {
   return (
     <div className="my-6 rounded border border-gray-300 dark:border-gray-700">
       <textarea
+        aria-label="Python source code"
         className="w-full resize-y bg-gray-50 p-3 font-mono text-sm dark:bg-gray-900"
         rows={Math.max(4, source.split("\n").length)}
         value={source}
@@ -82,7 +86,7 @@ export default function PyRunner({ code }: { code: string }) {
         )}
       </div>
       {output && (
-        <pre className="overflow-x-auto border-t border-gray-300 bg-black p-3 text-sm text-green-400 dark:border-gray-700">
+        <pre aria-live="polite" className="overflow-x-auto border-t border-gray-300 bg-black p-3 text-sm text-green-400 dark:border-gray-700">
 {output}
         </pre>
       )}
