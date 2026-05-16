@@ -17,9 +17,10 @@ const tutorials = (await getCollection("tutorials")).sort(
       <li>
         <a
           href={`/tutorials/${t.id}`}
+          aria-current={t.id === currentSlug ? "page" : undefined}
           class={
             t.id === currentSlug
-              ? "font-semibold text-blue-600"
+              ? "font-semibold text-blue-600 hover:underline"
               : "text-gray-700 hover:underline dark:text-gray-300"
           }
         >
