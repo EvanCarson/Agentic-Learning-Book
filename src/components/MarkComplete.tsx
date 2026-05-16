@@ -11,10 +11,10 @@ export default function MarkComplete({ slug }: { slug: string }) {
       className={
         done
           ? "rounded bg-green-600 px-4 py-2 text-sm font-medium text-white"
-          : "rounded border border-gray-400 px-4 py-2 text-sm font-medium hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
+          : "rounded border border-gray-400 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-800"
       }
     >
-      {done ? "✓ Completed" : "Mark complete"}
+      {done ? (<><span aria-hidden="true">✓</span> Completed</>) : "Mark complete"}
     </button>
   );
 }

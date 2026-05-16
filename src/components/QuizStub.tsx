@@ -2,6 +2,7 @@ export default function QuizStub({ title }: { title: string }) {
   return (
     <div
       role="note"
+      aria-label={`Quiz: ${title}`}
       className="my-6 rounded border border-dashed border-gray-400 p-6 text-center dark:border-gray-600"
     >
       <p className="text-lg font-semibold">Quiz: {title}</p>
