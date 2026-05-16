@@ -1,0 +1,32 @@
+---
+import { getCollection, render } from "astro:content";
+import TutorialLayout from "../../layouts/TutorialLayout.astro";
+import { getAdjacentTutorials, type NavEntry } from "../../lib/navigation";
+
+export async function getStaticPaths() {
+  const tutorials = await getCollection("tutorials");
+  const navEntries: NavEntry[] = tutorials.map((t) => ({
+    slug: t.id,
+    title: t.data.title,
+    order: t.data.order,
+  }));
+  return tutorials.map((entry) => {
+    const { prev, next } = getAdjacentTutorials(navEntries, entry.id);
+    return {
+      params: { slug: entry.id },
+      props: { entry, prev, next },
+    };
+  });
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+---
+<TutorialLayout
+  title={entry.data.title}
+  slug={entry.id}
+  prev={prev}
+  next={next}
+>
+  <Content />
+</TutorialLayout>
