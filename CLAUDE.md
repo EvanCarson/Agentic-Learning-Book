@@ -17,11 +17,21 @@ npm test           # Vitest unit tests (navigation helper)
 npm run typecheck  # astro check — AUTHORITATIVE type gate
 npm run build      # static build -> dist/ (validates content schema)
 npm run preview    # serve dist/ (run build first)
+npm run e2e        # Playwright headless browser UI tests (MANDATORY gate)
 ```
 
 **Critical:** `npm run build` uses esbuild and does **not** type-check.
 Always run `npm run typecheck` (`astro check`) for type validation — it is
-the real gate. CI/verification must run all three: test, typecheck, build.
+the real gate. Full verification runs all four: test, typecheck, build,
+**e2e**.
+
+`npm run e2e` builds and previews automatically (its Playwright `webServer`
+runs `npm run build && npm run preview`). Locally, `reuseExistingServer` is
+on: if you already have a stale `npm run preview` running, e2e tests it
+without rebuilding — run `CI=1 npm run e2e` (or stop the old preview) to
+force a fresh build. The PyRunner e2e requires network access to the
+Pyodide CDN (`cdn.jsdelivr.net`); it fails honestly if the CDN is
+unreachable rather than silently passing.
 
 ## Definition of Done
 
@@ -39,9 +49,15 @@ real browser (or headless browser automation):
 3. Navigation works (sidebar links, prev/next, active-link highlighting).
 
 Server-up / HTTP-200 / HTML-content smoke tests do **not** satisfy this —
-they do not load WASM, run JavaScript, or render styles. Until automated
-browser UI tests exist, this check is **manual and mandatory**; record
-that it was performed and its result before claiming completion.
+they do not load WASM, run JavaScript, or render styles.
+
+This gate is automated: **`npm run e2e`** (Playwright, headless Chromium)
+covers all three items above, including a live PyRunner run that asserts
+the real Python output. Completion claims must include a passing
+`npm run e2e` result. If the environment cannot reach the Pyodide CDN,
+the PyRunner test fails honestly — run it where the CDN is reachable
+(or in CI) and report the real result; never claim done on a skipped or
+CDN-blocked PyRunner test.
 
 ## Architecture
 

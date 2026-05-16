@@ -16,10 +16,19 @@ npm run dev      # http://localhost:4321
 npm test         # unit tests (navigation helper, Vitest)
 npm run typecheck # astro check — authoritative type gate
 npm run build    # static site -> dist/ (validates content schema)
+npm run e2e      # Playwright headless UI tests (mandatory gate)
 ```
 
 Note: `npm run build` uses esbuild and does NOT type-check. Always run
 `npm run typecheck` for type validation.
+
+`npm run e2e` is the **mandatory UI-testing gate** (see "Definition of
+Done" in CLAUDE.md): it builds, serves, and drives a headless browser —
+rendering checks, navigation, and a live PyRunner run that asserts the
+real in-browser Python output. It needs network access to the Pyodide
+CDN; run `npx playwright install chromium` once first. Locally, if a
+stale `npm run preview` is running, use `CI=1 npm run e2e` to force a
+fresh build.
 
 ## Add a tutorial
 
@@ -44,11 +53,14 @@ import PyRunner from "../../components/PyRunner.tsx";
   PEP 8 4-space lines into an existing 2-space block raises
   `IndentationError`. A future improvement is to load snippet code from a
   separate raw-imported `.py` file to preserve exact whitespace.
-- **In-browser Python run is a manual check:** automated build/typecheck
-  cannot exercise the live Pyodide runtime (it loads in a real browser).
-  See Manual verification below.
+- **In-browser Python run requires a real browser:** `build`/`typecheck`/
+  unit tests do not exercise the live Pyodide runtime. This is covered by
+  the automated `npm run e2e` gate (and can also be checked manually
+  below). It needs network access to the Pyodide CDN.
 
 ## Manual verification (Pyodide runtime)
+
+Automated coverage is `npm run e2e`. To check by hand instead:
 
 ```bash
 npm run build    # required before preview — serves dist/
