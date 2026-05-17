@@ -1202,6 +1202,12 @@ git commit -m "feat: migrate to lessons collection + curriculum routes; redirect
 
 ### Task 10: e2e coverage + final gates
 
+> **Amendment 10 (review):** syllabus heading query scoped to
+> `getByRole("main")` (avoids global `nth()` brittleness); the prev/next
+> test also asserts the sidebar's active-lesson `aria-current="page"`
+> (scoped to the `Curriculum` nav, since the Header link also carries
+> aria-current on `/learn*`).
+
 **Files:**
 - Modify: `e2e/site.spec.ts`
 
