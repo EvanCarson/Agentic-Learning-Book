@@ -5,8 +5,49 @@ order: 5
 type: "quiz"
 summary: "Quick knowledge check on the agent loop and its parts."
 estMinutes: 4
+questions:
+  - prompt: "What is the agent loop?"
+    options:
+      - "A Python for-loop with no model"
+      - "Perceive, then decide, then act, repeated each step"
+      - "A cache of previous LLM responses"
+      - "The transformer attention mechanism"
+    answerIndex: 1
+    explanation: "The loop is perceive, decide (the policy), then act, repeated each step. It is the whole game."
+  - prompt: "Why develop against a deterministic mock LLM first?"
+    options:
+      - "Reproducible, free runs with no API keys or flakiness"
+      - "Mocks answer more accurately than real models"
+      - "It removes the need for an agent loop"
+      - "Mocks can call external tools automatically"
+    answerIndex: 0
+    explanation: "A mock gives the same prompt-to-response interface deterministically, so you learn mechanics without cost or nondeterminism."
+  - prompt: "In the seam policy(observation) -> action, what does the policy do?"
+    options:
+      - "Persists progress to local storage"
+      - "Renders the lesson page"
+      - "Chooses the next action from the observation"
+      - "Downloads the Python runtime"
+    answerIndex: 2
+    explanation: "The policy maps an observation to the next action. It is the swappable decision-maker, whether a mock or a real model."
+  - prompt: "What are the four separable parts of an agent?"
+    options:
+      - "Tokens, weights, prompts, embeddings"
+      - "Perception, policy, action, memory"
+      - "Input, output, cache, log"
+      - "Plan, tool, retry, score"
+    answerIndex: 1
+    explanation: "Every agent has perception, policy, action, and memory. Keeping them separable is the first engineering best practice."
+  - prompt: "When you replace the mock with a real model, what stays the same?"
+    options:
+      - "The agent loop and the policy interface"
+      - "Nothing; the loop is rewritten"
+      - "The provider API key"
+      - "Only the print format"
+    answerIndex: 0
+    explanation: "The agent code calls policy(...) either way; only what is behind the seam changes. That is the point of the seam."
 ---
 
-A knowledge check for the Foundations module. The interactive quiz engine
-is coming soon; review the loop, the mock-LLM idea, and the four agent
-parts, then mark this complete when you are confident.
+A knowledge check for the Foundations module. Answer every question, then
+submit to see your score and an explanation for each. Score 70% or higher
+to mark this lesson complete; you can retry as many times as you like.
