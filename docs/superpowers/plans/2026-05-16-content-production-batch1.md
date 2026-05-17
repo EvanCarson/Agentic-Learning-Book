@@ -488,6 +488,11 @@ test.describe("curriculum", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "The Agent Loop" }),
     ).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Curriculum" })
+        .locator('a[aria-current="page"]'),
+    ).toHaveAttribute("href", "/learn/02-the-agent-loop");
   });
 
   test("mark complete persists across reload", async ({ page }) => {
