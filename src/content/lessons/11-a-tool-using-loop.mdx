@@ -10,8 +10,8 @@ estMinutes: 12
 import PyRunner from "../../components/PyRunner.tsx";
 
 **Objective:** wire a tool registry into the loop — the policy chooses a
-tool name, the runtime executes the registered function, the result feeds
-back as the next observation.
+tool name and the runtime executes the registered function from a registry
+you control.
 
 <PyRunner client:visible code={`def get_weather(city):
     return "sunny in " + city
@@ -31,7 +31,7 @@ class MockLLM:
 
 def run(prompt, llm):
     decision = llm(prompt)
-    name, sep, arg = decision.partition(":")
+    name, _, arg = decision.partition(":")
     name = name.strip()
     if name in TOOLS:
         result = TOOLS[name](arg.strip())
@@ -51,7 +51,7 @@ for p in ["weather in paris", "two plus three", "hello"]:
 
 This `MockLLM` is the same seam from Foundations — the loop never trusts
 the model to *run* anything; it maps a chosen **name** to a vetted
-function in `TOOLS`. Unknown names fall back to a plain answer.
+function in `TOOLS`. Unknown names fall back to a plain answer. Note that each tool unpacks its own arguments (`add` splits the comma-packed string) — argument parsing is the tool's job, not the dispatcher's.
 
 > **Best practice:** the model selects a tool by name from a registry you
 > control; argument parsing and execution are your code, not the model's.
