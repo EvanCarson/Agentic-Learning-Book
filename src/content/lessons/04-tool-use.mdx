@@ -1,0 +1,16 @@
+---
+title: "Tool Use"
+moduleId: "patterns"
+order: 1
+type: "reading"
+summary: "Giving agents tools so their actions can affect the world."
+estMinutes: 7
+---
+
+A bare agent can only think. **Tools** let it act: search, run code,
+call an API, query a database. The pattern is always the same — the
+policy chooses a tool and arguments, the runtime executes it, and the
+result becomes the next observation.
+
+Best practice: keep each tool small, well-described, and independently
+testable, exactly like the agent parts in the previous module.

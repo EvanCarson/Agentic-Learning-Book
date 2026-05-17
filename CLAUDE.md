@@ -5,7 +5,7 @@ Guidance for working in this repository.
 ## Project
 
 Agentic Learning Book — a static, interactive web app teaching agentic AI.
-Tutorials are MDX; Python snippets run **entirely in the browser** via
+Lessons are MDX; Python snippets run **entirely in the browser** via
 Pyodide (CPython→WASM). No backend, no accounts, no database. Deployable to
 any static host.
 
@@ -26,7 +26,7 @@ buildable-but-broken change will otherwise deploy.
 
 ```bash
 npm run dev        # dev server, http://localhost:4321
-npm test           # Vitest unit tests (navigation helper)
+npm test           # Vitest unit tests (curriculum + progress store)
 npm run typecheck  # astro check — AUTHORITATIVE type gate
 npm run build      # static build -> dist/ (validates content schema)
 npm run preview    # serve dist/ (run build first)
@@ -76,17 +76,28 @@ CDN-blocked PyRunner test.
 
 - **Stack:** Astro 6 (static), React 19 islands, Tailwind v4 (`@tailwindcss/vite`
   + `@tailwindcss/typography`), MDX, TypeScript strict.
-- **Content:** `src/content.config.ts` defines the `tutorials` collection
+- **Content:** `src/content.config.ts` defines the `lessons` collection
   (Astro 6 content layer — `glob` loader, `z` imported from `zod` directly,
-  NOT from `astro:content`). Schema: `title`, `order`, `summary`.
-- **Tutorials:** `src/content/tutorials/NN-slug.mdx`. The entry `id`
+  NOT from `astro:content`). Schema: `title`, `moduleId`, `order`,
+  `type` (`reading` | `interactive` | `quiz`), `summary`, `estMinutes`.
+- **Module config:** `src/content/modules.ts` — typed `Module[]` defining
+  module ids (`foundations`, `patterns`, …), titles, and ordering.
+- **Lessons:** `src/content/lessons/NN-slug.mdx`. The entry `id`
   (filename-derived) is the slug used everywhere.
-- **Routing:** `src/pages/tutorials/[...slug].astro` static-generates one
-  page per entry via `getStaticPaths`, renders MDX with `render(entry)`.
+- **Routing:** `src/pages/learn/index.astro` (syllabus/curriculum overview)
+  and `src/pages/learn/[...slug].astro` (single lesson, static-generates one
+  page per entry via `getStaticPaths`, renders MDX with `render(entry)`).
+- **Redirects:** `/tutorials/[...slug]` → `/learn/[...slug]` (in
+  `astro.config.mjs`) so the live production URL keeps working.
 - **Layouts:** `BaseLayout.astro` (HTML shell, global.css, Header) →
-  `TutorialLayout.astro` (Sidebar + prose article + prev/next).
-- **Navigation:** `src/lib/navigation.ts` — pure `getAdjacentTutorials`,
-  unit-tested (`tests/navigation.test.ts`). The only non-trivial logic.
+  `LessonLayout.astro` (Sidebar + prose article + prev/next).
+- **Curriculum logic:** `src/lib/curriculum.ts` — pure `buildCurriculum` /
+  `adjacent`, unit-tested (`tests/curriculum.test.ts`). The only non-trivial
+  logic.
+- **Progress:** `src/lib/progress/` — `ProgressStore` interface,
+  `LocalStorageProgressStore` implementation, `useProgress` React hook.
+  localStorage now; Supabase later behind the same sync interface.
+- **React islands:** `Sidebar`, `Syllabus`, `MarkComplete`, `QuizStub`.
 - **Python runner:** `src/components/PyRunner.tsx` — client island,
   lazy-loads Pyodide from CDN (pinned `0.27.2`) on first Run. Embed in MDX:
   `<PyRunner client:visible code={`...`} />`.
@@ -113,8 +124,19 @@ CDN-blocked PyRunner test.
   `build`/`typecheck`/unit tests alone, but ARE covered by the automated
   **`npm run e2e`** gate (headless Chromium + live PyRunner assertion).
 
-## Adding a tutorial
+## Adding a lesson
 
-Drop `src/content/tutorials/NN-slug.mdx` with `title`/`order`/`summary`
-frontmatter. It auto-appears in the sidebar (ordered by `order`) and gets a
-route. Use pure-Python snippets (no network/`pip`) so they run in Pyodide.
+Drop `src/content/lessons/NN-slug.mdx` with frontmatter fields:
+`title`, `moduleId`, `order`, `type` (`reading` | `interactive` | `quiz`),
+`summary`, `estMinutes`. Module ids come from `src/content/modules.ts`.
+The lesson auto-appears in the sidebar and syllabus, ordered by module then
+`order`, and gets a `/learn/NN-slug` route. For interactive lessons, embed
+`<PyRunner client:visible code={`...`} />` — use pure-Python snippets
+(no network/`pip`) so they run in Pyodide.
+
+> Caveats: a `moduleId` not present in `src/content/modules.ts` is **not**
+> caught by `npm run typecheck` — it fails at `npm run build` (the
+> integrity check runs in `getStaticPaths`). For `type: "quiz"` lessons,
+> the MDX body is intentionally suppressed: `LessonLayout` renders
+> `QuizStub` instead of the lesson body, so prose in a quiz `.mdx` file
+> will not be shown.

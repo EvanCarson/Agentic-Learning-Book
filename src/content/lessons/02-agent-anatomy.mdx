@@ -1,0 +1,19 @@
+---
+title: "Anatomy of an Agent"
+moduleId: "foundations"
+order: 2
+type: "reading"
+summary: "Perception, policy, action, memory — the parts every agent has."
+estMinutes: 6
+---
+
+Every agent, however simple, has four moving parts:
+
+- **Perception** — turning the environment into an observation.
+- **Policy** — deciding the next action from that observation.
+- **Action** — affecting the world (a tool call, an answer, a step).
+- **Memory** — carrying state across loop iterations.
+
+Keeping these separable is the first best practice: you can test the
+policy without a real environment, and swap perception or tools without
+rewriting the loop.

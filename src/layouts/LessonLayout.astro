@@ -1,0 +1,50 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import MarkComplete from "../components/MarkComplete.tsx";
+import QuizStub from "../components/QuizStub.tsx";
+import TrackVisit from "../components/TrackVisit.tsx";
+import type { Curriculum, LessonMeta, Adjacent } from "../lib/curriculum";
+
+interface Props {
+  lesson: LessonMeta;
+  curriculum: Curriculum;
+  adjacent: Adjacent;
+}
+const { lesson, curriculum, adjacent } = Astro.props;
+---
+<BaseLayout title={lesson.title}>
+  <div class="grid grid-cols-1 gap-8 md:grid-cols-[16rem_1fr]">
+    <aside class="md:border-r md:border-gray-200 md:pr-4 md:dark:border-gray-800">
+      <Sidebar curriculum={curriculum} currentSlug={lesson.slug} />
+    </aside>
+    <article class="prose max-w-none dark:prose-invert">
+      <TrackVisit client:load slug={lesson.slug} />
+      <p class="text-xs uppercase tracking-wide text-gray-500">
+        {lesson.type} · {lesson.estMinutes} min
+      </p>
+      <h1>{lesson.title}</h1>
+      {lesson.type === "quiz" ? (
+        <QuizStub client:load title={lesson.title} />
+      ) : lesson.type === "reading" || lesson.type === "interactive" ? (
+        <slot />
+      ) : (
+        <p role="status">Unsupported lesson type: {lesson.type}</p>
+      )}
+      <div class="mt-8 not-prose">
+        <MarkComplete client:load slug={lesson.slug} />
+      </div>
+      <nav
+        aria-label="Lesson navigation"
+        class="mt-12 flex justify-between border-t border-gray-200 pt-4 text-sm dark:border-gray-800"
+      >
+        {adjacent.prev ? (
+          <a href={`/learn/${adjacent.prev.slug}`}>← {adjacent.prev.title}</a>
+        ) : <span />}
+        {adjacent.next ? (
+          <a href={`/learn/${adjacent.next.slug}`}>{adjacent.next.title} →</a>
+        ) : <span />}
+      </nav>
+    </article>
+  </div>
+</BaseLayout>

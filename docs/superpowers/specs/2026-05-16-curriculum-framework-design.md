@@ -35,7 +35,12 @@ UI rework.
   order. No gating/locking.
 - **Progress:** clean `ProgressStore` interface; `LocalStorageProgressStore`
   implementation in this slice. Subsystem A adds `SupabaseProgressStore`
-  behind the same interface.
+  behind the same interface. **Seam contract:** the interface is
+  intentionally *synchronous*. Subsystem A's design MUST honor this by
+  hydrating all progress into a local cache on mount and serving reads
+  from that cache (writes fire-and-forget + reconcile to Supabase) — not
+  by making the interface async. This keeps every consumer (sidebar,
+  syllabus, mark-complete islands) unchanged when the backend is swapped.
 - **Modeling approach (A1):** typed module config + `lessons` MDX
   collection + build-time integrity check.
 - **Authoring:** continues the existing MDX-in-repo content-collection
@@ -52,12 +57,14 @@ UI rework.
   schema (Zod):
   - `title: string`
   - `moduleId: string` (must match a module `id`)
-  - `order: number` (int, ≥ 0; ordering within its module)
+  - `order: number` (int, ≥ 1; one-based ordering within its module)
   - `type: "reading" | "interactive" | "quiz"`
   - `summary: string`
   - `estMinutes: number` (int, > 0)
-- **Build-time integrity check** (runs in the content config / a checked
-  module imported by it, so failures fail `astro build` and `astro check`):
+- **Build-time integrity check** (runs inside `getStaticPaths` / page
+  setup via `buildCurriculum`, so failures fail `astro build`; note
+  `astro check` only type-checks and does NOT execute this — cross-entry
+  integrity errors surface at `npm run build`, documented in CLAUDE.md):
   - every lesson `moduleId` exists in the module config
   - `(moduleId, order)` pairs are unique
   - every module has ≥ 1 lesson
@@ -133,7 +140,11 @@ independently testable.
 ## Error handling
 
 - Build-time: integrity check throws precise errors (offending
-  lesson/module named) → fails `astro build` / `astro check`.
+  lesson/module named) → fails `astro build` (not `astro check`, which
+  only type-checks). `LessonLayout` additionally renders an explicit
+  `role="status"` "unsupported lesson type" block for any non
+  reading/interactive/quiz type (defense even though the Zod enum
+  constrains it).
 - `LocalStorageProgressStore`: try/catch around all storage access;
   corrupt JSON or disabled storage → in-memory fallback; UI never sees a
   throw.

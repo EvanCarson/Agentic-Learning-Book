@@ -1,0 +1,16 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Syllabus from "../../components/Syllabus.astro";
+import { buildCurriculum, type LessonMeta } from "../../lib/curriculum";
+import { toLessonMeta } from "../../lib/toLessonMeta";
+import { modules } from "../../content/modules";
+
+const entries = await getCollection("lessons");
+const lessons: LessonMeta[] = entries.map(toLessonMeta);
+const curriculum = buildCurriculum(modules, lessons);
+---
+<BaseLayout title="Curriculum">
+  <h1 class="mb-6 text-4xl font-bold">Agentic AI Curriculum</h1>
+  <Syllabus curriculum={curriculum} />
+</BaseLayout>
