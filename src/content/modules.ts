@@ -31,4 +31,10 @@ export const modules: Module[] = [
     order: 4,
     summary: "Grounding answers in retrieved context with citations.",
   },
+  {
+    id: "memory",
+    title: "Memory & State",
+    order: 5,
+    summary: "Carrying state across turns: working memory and summaries.",
+  },
 ];

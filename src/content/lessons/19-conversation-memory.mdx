@@ -1,0 +1,44 @@
+---
+title: "Conversation Memory"
+moduleId: "memory"
+order: 2
+type: "interactive"
+summary: "Add a transcript and naive summarisation to keep context bounded."
+estMinutes: 11
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** keep a turn transcript and, when it exceeds a budget,
+compress the oldest turn into a running summary so context stays bounded.
+
+<PyRunner client:visible code={`class Memory:
+    def __init__(self, budget):
+        self.budget = budget
+        self.turns = []
+        self.summary = ""
+
+    def add(self, turn):
+        self.turns.append(turn)
+        if len(self.turns) > self.budget:
+            old = self.turns[0]
+            self.turns = self.turns[1:]
+            self.summary = (self.summary + " | " + old).strip(" |")
+
+    def context(self):
+        return "summary=[" + self.summary + "] recent=" + str(self.turns)
+
+m = Memory(budget=2)
+for t in ["user:hi", "bot:hello", "user:weather?", "bot:sunny"]:
+    m.add(t)
+    print(m.context())
+`} />
+
+The same shape as real summarisation, with a trivial string compressor
+instead of a model call (subsystem D). The policy — your Foundations
+`MockLLM` seam — only ever sees `context()`, never the raw unbounded log.
+
+> **Best practice:** bound working memory explicitly; what to keep is a
+> policy decision you should be able to test deterministically.
+
+Next: **Memory Pitfalls**

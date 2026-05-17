@@ -1,0 +1,62 @@
+---
+title: "Why Agents Need Memory"
+moduleId: "memory"
+order: 1
+type: "reading"
+summary: "Working memory vs long-term memory; what to keep and why."
+estMinutes: 7
+---
+
+**Objective:** distinguish per-run working memory from cross-run long-term memory and the cost/relevance tradeoffs.
+
+## The stateless loop
+
+The agent loop you built in Foundations executes a clear cycle: observe,
+decide, act, repeat. On its own that loop is entirely stateless — each call
+to the decision policy receives only whatever you hand it. If you hand it
+nothing, the agent cannot refer to what happened one turn ago, let alone one
+session ago. Memory is the mechanism that breaks that constraint.
+
+## Working memory
+
+Working memory is the running transcript of the *current* run: every user
+message, every model response, every tool result accumulated since the agent
+started. It lives in RAM, scoped to a single invocation, and disappears when
+the process ends. It is "memory" in the intuitive sense — what the agent
+can refer back to mid-conversation.
+
+The catch is the context window. Every model has a hard token budget for
+a single call, and working memory grows with every turn. Left unchecked, a
+long conversation eventually exceeds that budget, at which point the runtime
+either truncates silently (dropping the oldest turns) or errors out. Both
+outcomes can be catastrophic: a truncated instruction or a dropped tool
+result corrupts the agent's reasoning with no warning.
+
+## Long-term memory
+
+Long-term memory stores facts that persist *across* runs: user preferences,
+project state, historical decisions, anything the agent should know at the
+start of the next session. Unlike working memory, it is external — a
+database, a file, a vector store (see Retrieval & RAG). The agent must
+explicitly read from it at the start of a run and write to it when something
+worth keeping occurs.
+
+## Selection and compression
+
+Because the context window is finite, getting memory right is fundamentally
+a *selection* problem: of everything you have stored, what should enter this
+prompt right now? The answer changes turn by turn. Relevant working-memory
+items from twenty turns ago may matter; some long-term facts may be stale
+or irrelevant. Summarisation — compressing older turns into a shorter
+representation — is the most common mitigation for working memory growth,
+and you will build one in the next lesson.
+
+Memory is also a tool (see Tool Use): the policy can read and write memory
+stores as explicit actions, making memory management first-class and
+testable rather than a hidden side-effect of the runtime.
+
+> **Best practice:** treat context as a budget — store everything, but
+> *select* what enters the prompt. The raw store is your source of truth;
+> what the model sees is a curated, size-bounded view of it.
+
+Next: **Conversation Memory**

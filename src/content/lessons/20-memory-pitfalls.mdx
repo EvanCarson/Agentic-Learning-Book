@@ -1,0 +1,67 @@
+---
+title: "Memory Pitfalls"
+moduleId: "memory"
+order: 3
+type: "reading"
+summary: "Context bloat, lossy summaries, and stale facts."
+estMinutes: 7
+---
+
+**Objective:** the failure modes of memory systems and how to mitigate them.
+
+## Context bloat
+
+The most common memory failure is the simplest: no eviction strategy at all.
+When every turn is appended to the transcript indefinitely, the context
+window eventually fills. Costs rise linearly with conversation length;
+latency follows. Worse, many runtimes silently truncate the *oldest* content
+when the limit is hit — the part most likely to contain the original
+instruction or a critical constraint stated early in the session. By the
+time truncation happens, the agent has no way to know what it no longer
+knows.
+
+The mitigation is explicit budgeting, as you implemented in the previous
+lesson: append, then evict when the window exceeds its bound. Do it
+deliberately rather than letting the runtime do it invisibly.
+
+## Lossy summaries
+
+Summarisation solves the bloat problem but introduces a subtler one: every
+compression step is lossy. A summary that said "the user wants a report on
+Q3 sales" discards the exact column names, the date range, the output
+format, and the tone the user specified. If the agent later needs any of
+those specifics, the summary cannot reconstruct them.
+
+The correct pattern is to summarise only the *prompt view* — the text the
+model receives — while keeping the raw turn log in a separate store you can
+re-derive from. Summaries are a rendering concern; they do not replace the
+source of truth. If you need to replay, re-summarise with a different
+strategy, or audit what the agent was told, the raw log must be intact.
+
+## Stale long-term facts
+
+Long-term memory introduces a time dimension: facts written in a previous
+session may no longer be true. A user preference changes. A project
+deadline shifts. A resolved bug is re-introduced. If the agent reads stale
+facts without checking their recency or validity, it acts on outdated
+information with full confidence.
+
+Mitigations include timestamping every long-term memory write, attaching a
+validity scope (e.g., "current as of session X"), and treating high-stakes
+retrieved facts as hypotheses to verify rather than ground truth. The same
+retrieval hygiene that applies to external documents (see Retrieval & RAG)
+applies here.
+
+## Privacy of stored memory
+
+Persisting conversation content raises data-handling responsibilities:
+what is stored, for how long, who can read it, and how it is deleted.
+These constraints matter most in multi-user or multi-tenant systems. Full
+treatment belongs to the Guardrails & Safety module, but building the raw
+store with explicit scoping and deletion paths from the start is far cheaper
+than retrofitting them later.
+
+> **Best practice:** summaries are for the prompt, not the system of record
+> — never delete the raw store you can re-derive from.
+
+Next: **Memory & State Check**
