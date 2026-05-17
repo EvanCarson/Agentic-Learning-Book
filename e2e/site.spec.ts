@@ -65,26 +65,40 @@ test.describe("curriculum", () => {
     page,
   }) => {
     await page.goto("/learn/05-foundations-check");
+    // Precondition: the lesson is not yet complete, so a later "Completed"
+    // is attributable to the quiz pass (not pre-existing/auto state).
+    await expect(
+      page.getByRole("button", { name: /Mark complete/i }),
+    ).toBeVisible();
     await page
       .getByRole("radio", {
         name: "Perceive, then decide, then act, repeated each step",
+        exact: true,
       })
       .check();
     await page
       .getByRole("radio", {
         name: "Reproducible, free runs with no API keys or flakiness",
+        exact: true,
       })
       .check();
     await page
       .getByRole("radio", {
         name: "Chooses the next action from the observation",
+        exact: true,
       })
       .check();
     await page
-      .getByRole("radio", { name: "Perception, policy, action, memory" })
+      .getByRole("radio", {
+        name: "Perception, policy, action, memory",
+        exact: true,
+      })
       .check();
     await page
-      .getByRole("radio", { name: "The agent loop and the policy interface" })
+      .getByRole("radio", {
+        name: "The agent loop and the policy interface",
+        exact: true,
+      })
       .check();
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByRole("status")).toContainText("You scored 5 / 5");
@@ -92,6 +106,10 @@ test.describe("curriculum", () => {
       page.getByRole("button", { name: /Completed/i }),
     ).toBeVisible();
     await page.reload();
+    // After reload the quiz remounts unsubmitted (in-memory answers reset,
+    // so the score status is gone) — yet the lesson is still complete,
+    // which can only come from the persisted ProgressStore (localStorage).
+    await expect(page.getByRole("status")).toHaveCount(0);
     await expect(
       page.getByRole("button", { name: /Completed/i }),
     ).toBeVisible();
