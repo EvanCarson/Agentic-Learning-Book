@@ -763,7 +763,7 @@ for obs in ["ok input", "error here", "ok again"]:
     print("step:", obs, "->", a)
 
 print("trace length =", len(t.events))
-print("replay:", [e["action"] for e in t.events])
+print("recorded actions:", [e["action"] for e in t.events])
 `} />
 
 Each step appends a structured event. The trace is data: you can print
@@ -774,7 +774,7 @@ it, assert on it in tests, or replay the action sequence.
 
 Next: **Debugging From Traces**.
 ````
-Deterministic output: `step: ok input -> answer` / `step: error here -> retry` / `step: ok again -> answer` / `trace length = 3` / `replay: ['answer', 'retry', 'answer']`.
+Deterministic output: `step: ok input -> answer` / `step: error here -> retry` / `step: ok again -> answer` / `trace length = 3` / `recorded actions: ['answer', 'retry', 'answer']`.
 
 **`44-debugging-from-traces.mdx`** — reading, order 3, estMinutes 7, summary "From a failed trajectory to a root cause and a regression case."
 Objective: the workflow from a captured failure to a fix that stays fixed.
