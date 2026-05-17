@@ -37,4 +37,10 @@ export const modules: Module[] = [
     order: 5,
     summary: "Carrying state across turns: working memory and summaries.",
   },
+  {
+    id: "planning",
+    title: "Planning & Reasoning",
+    order: 6,
+    summary: "Decomposition, plan-execute, and reflection loops.",
+  },
 ];
