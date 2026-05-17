@@ -10,7 +10,7 @@ export const quizQuestionSchema = z
   .superRefine((q, ctx) => {
     if (q.answerIndex >= q.options.length) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["answerIndex"],
         message: `answerIndex ${q.answerIndex} is out of range for ${q.options.length} options`,
       });
