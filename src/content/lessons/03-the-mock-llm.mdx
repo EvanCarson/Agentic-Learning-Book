@@ -1,0 +1,48 @@
+---
+title: "The Mock LLM"
+moduleId: "foundations"
+order: 3
+type: "interactive"
+summary: "Swap the hardcoded policy for a deterministic mock LLM you control."
+estMinutes: 10
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** make the policy a **mock LLM** — a deterministic
+`prompt -> response` you fully control — so you can learn agent mechanics
+without keys, cost, or flakiness.
+
+A real LLM is just `prompt -> text`. For learning, a dictionary-backed
+mock gives the same interface with none of the nondeterminism. Every later
+module reuses exactly this seam; only the implementation behind it changes
+when real models arrive.
+
+<PyRunner client:visible code={`class MockLLM:
+    def __init__(self, table):
+        self.table = table
+
+    def __call__(self, prompt):
+        return self.table.get(prompt, "answer:i_dont_know")
+
+policy = MockLLM({
+    "weather in nyc?": "tool:get_weather",
+    "say hi": "answer:hello",
+})
+
+def agent_step(prompt, llm):
+    decision = llm(prompt)
+    print(f"prompt={prompt!r} -> {decision!r}")
+
+for p in ["weather in nyc?", "say hi", "unknown request"]:
+    agent_step(p, policy)
+`} />
+
+The agent code never changes when you go from this mock to a real model —
+it still just calls `policy(prompt)`. That is the entire point of the seam.
+
+> **Best practice:** write every agent against a policy interface, then
+> develop and test against a deterministic mock. Real-model wiring becomes
+> a one-line swap, and your tests stay fast and reproducible.
+
+Next: **Anatomy of an Agent** — name the parts you just used.
