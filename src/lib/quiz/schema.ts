@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { QuizQuestion } from "./grade";
 
 export const quizQuestionSchema = z
   .object({
@@ -16,3 +17,13 @@ export const quizQuestionSchema = z
       });
     }
   });
+
+// Compile-time guard: the validated schema output must stay structurally
+// identical to the hand-written QuizQuestion contract in grade.ts (which
+// must remain zod-free). If the two definitions drift, the type below
+// resolves to `never` and this assignment fails `astro check`.
+type Equals<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never;
+export const _quizQuestionConformance: Equals<
+  z.infer<typeof quizQuestionSchema>,
+  QuizQuestion
+> = true;

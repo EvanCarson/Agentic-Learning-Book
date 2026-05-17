@@ -23,6 +23,9 @@ describe("toLessonMeta", () => {
       summary: "The loop.",
       estMinutes: 10,
     });
+    expect(
+      toLessonMeta(entry as Parameters<typeof toLessonMeta>[0]).questions,
+    ).toBeUndefined();
   });
 
   it("carries a questions array through when present", () => {
