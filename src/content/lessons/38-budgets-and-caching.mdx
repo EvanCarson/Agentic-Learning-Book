@@ -9,62 +9,52 @@ estMinutes: 8
 
 **Objective:** explain the cost/latency model of agent loops and the first levers (budgets, caching).
 
-Every call to a language model is a transaction: tokens consumed on input and
-output map directly to money spent and latency added. In a single-turn chat
-that cost is bounded and visible. In an agent loop it multiplies. A planning
-step, three tool calls, a reflection, and a final synthesis can consume five
-or more round-trips in one user-visible action. If any step spawns sub-agents
-or re-queries on failure, the multiplier grows further.
+Every call to a language model is a transaction: tokens in and out map
+directly to money and latency. In a single-turn chat that cost is bounded. In
+an agent loop it multiplies. A planning step, three tool calls, a reflection,
+and a final synthesis can consume five or more round-trips. If a step spawns
+sub-agents or re-queries on failure, the multiplier grows further.
 
 ## Each step costs tokens and time
 
-Input tokens cover the instruction, any conversation history you carry
-forward, retrieved chunks, and tool results accumulated so far. Output tokens
-cover the model's reasoning and the action it proposes. Both dimensions add
-up within a single step; across multiple steps, context often grows because
-earlier results stay in the window. A loop that does not actively prune its
-context can reach the model's context limit before the task finishes, in
-addition to spending far more than necessary on each subsequent call.
+Input tokens cover the instruction, history, retrieved chunks, and accumulated
+tool results. Output tokens cover reasoning and the proposed action. Both add
+up within a step; across steps, context grows because earlier results stay in
+the window. A loop that does not prune its context can hit the model's limit
+before the task finishes — and overspend on every call along the way.
 
 Real provider token pricing and in-flight token counting connect through
 dedicated client libraries (real integration: subsystem D).
 
 ## A hard budget per run
 
-The simplest reliability improvement is an explicit budget that every run
-carries: a step count, a token count, or both. When the budget is exhausted
-the agent stops and returns whatever partial result it has rather than
-continuing indefinitely. "Degrade gracefully, never run forever" is the
-governing principle. A budget is not just a cost control; it is a safety
-property — a runaway agent is a reliability failure before it is a financial
-one.
+The simplest reliability improvement is an explicit budget every run carries:
+a step count, a token count, or both. When the budget is exhausted the agent
+stops and returns whatever partial result it has rather than continuing
+indefinitely. A budget is not just a cost control; it is a safety property —
+a runaway agent is a reliability failure before it is a financial one.
 
 > **Best practice:** every agent run carries an explicit budget; exceeding it
 > degrades gracefully, it doesn't run forever.
 
 ## Caching identical calls
 
-Many agent workloads issue the same call multiple times: the same retrieved
-chunk summarised twice, the same classification asked on repeated inputs, the
-same instruction block prepended to every message. A cache keyed on the exact
-prompt skips the model call entirely for a hit — zero additional tokens, zero
-additional latency. Even a shallow in-process cache covering the current run
-eliminates a large fraction of spend in loops that re-query on failures or
-retries.
+Many workloads issue the same call repeatedly: the same chunk summarised
+twice, the same classification on repeated inputs, the same instruction on
+every message. A cache keyed on the exact prompt skips the model call for a
+hit — zero extra tokens, zero extra latency. Even a shallow in-process cache
+eliminates a large fraction of spend in loops that re-query on failures.
 
-Batching is a related lever: where calls are independent and latency
-tolerance allows it, submitting them as a batch rather than sequentially cuts
-wall-clock time and, on some providers, reduces per-call overhead (real
-integration: subsystem D).
+Batching is a related lever: submitting independent calls together rather than
+sequentially cuts wall-clock time and, on some providers, per-call overhead
+(real integration: subsystem D).
 
 ## The cheapest call is the one you don't make
 
-Caching and batching both express the same underlying principle: before you
-spend a token, check whether you already have the answer. Prepend a fast
-deterministic check — a cache lookup, a rule, a pre-computed result — in
-front of every model call. The check costs microseconds; a model round-trip
-costs hundreds of milliseconds and real money. A well-placed cache is often
-the single largest cost reduction available in a deployed agent loop.
+Before you spend a token, check whether you already have the answer. Prepend
+a fast deterministic check — a cache lookup, a rule, a pre-computed result —
+in front of every model call. The check costs microseconds; a model
+round-trip costs hundreds of milliseconds and real money.
 
 Budget and cache together form the first reliability layer: caps prevent
 runaway spending; caches prevent redundant spending. The next lesson builds
