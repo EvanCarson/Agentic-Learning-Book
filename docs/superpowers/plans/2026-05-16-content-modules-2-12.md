@@ -34,6 +34,16 @@
 
 ## Per-task template (apply to every Module task below)
 
+> **Authoritative-conventions note:** the **Conventions** section above
+> is authoritative and overrides any stale punctuation/prose in the
+> per-module verbatim blocks below (which were drafted before the lock).
+> Specifically, for every interactive lesson: the closing line is
+> `Next: **<Title>**` with NO trailing period; include one sentence
+> bridging to the Module-1 `MockLLM` seam; and where a tool/component
+> parses its own arguments, say so in one sentence. Objectives must
+> describe only what the shown code demonstrates (don't claim behaviour
+> the snippet doesn't exhibit).
+
 **Files:** Modify `src/content/modules.ts` (append the one entry for this module from the table above, preserving the existing `Module` interface and the Foundations entry). Create the 4 lesson files listed in the task.
 
 **Steps (every Module task):**
@@ -176,8 +186,8 @@ estMinutes: 12
 import PyRunner from "../../components/PyRunner.tsx";
 
 **Objective:** wire a tool registry into the loop — the policy chooses a
-tool name, the runtime executes the registered function, the result feeds
-back as the next observation.
+tool name and the runtime executes the registered function from a registry
+you control.
 
 <PyRunner client:visible code={`def get_weather(city):
     return "sunny in " + city
@@ -197,7 +207,7 @@ class MockLLM:
 
 def run(prompt, llm):
     decision = llm(prompt)
-    name, sep, arg = decision.partition(":")
+    name, _, arg = decision.partition(":")
     name = name.strip()
     if name in TOOLS:
         result = TOOLS[name](arg.strip())
