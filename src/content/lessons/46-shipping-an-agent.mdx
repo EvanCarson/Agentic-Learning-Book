@@ -1,0 +1,86 @@
+---
+title: "Shipping an Agent"
+moduleId: "production"
+order: 1
+type: "reading"
+summary: "Statelessness, real-API integration, config, and rollout."
+estMinutes: 9
+---
+
+**Objective:** explain what changes when the agent leaves the notebook — statelessness, real model/tool wiring, config/secrets, and staged rollout.
+
+Building an agent in a notebook is straightforward: the interpreter holds
+the conversation buffer in memory, credentials live in environment variables
+you set once, and a bug means you re-run a cell. Production is a different
+contract. Requests arrive from outside, processes restart, secrets must be
+managed safely, and a bad deploy can reach real users at scale.
+
+## Stateless request handlers
+
+A notebook agent accumulates state in interpreter memory across cells. A
+production agent runs inside a stateless request handler: each inbound
+request arrives cold, carries everything the agent needs in its payload or
+via an external lookup, and returns a structured result before the handler
+exits. The handler must not retain per-user or per-run state between calls.
+
+This design is not a constraint — it is an asset. Stateless handlers scale
+horizontally without coordination, restart cleanly after failure, and are
+trivial to test with ordinary function calls.
+
+The corollary: anything that needs to persist across requests lives outside
+the handler. Conversation history goes to an external store (key-value,
+database, or cache); working memory follows the same pattern as the Memory
+& State module, now backed by a durable service rather than an in-process
+dict. The handler reads the state, runs the loop, and writes updates back —
+all in one request cycle.
+
+## Real API integration at the seam
+
+Every module in this course built the policy as a local `MockLLM` or
+deterministic function. That was intentional. The policy is a seam — a
+boundary between the loop's orchestration logic and the decision-maker
+behind it. In production, you swap the implementation behind that seam for
+a call to a real model API (real integration: subsystem D). Nothing in the
+loop changes: the handler still calls `policy(observation)` and acts on the
+structured result. Real tool integrations — web search, code execution,
+external APIs — plug in at the same seam used for mock tools since the Tool
+Use module (real integration: subsystem D).
+
+> **Best practice:** the seam you mocked since Module 1 is the exact swap
+> point for real models — production changes the implementation behind it,
+> not your loop.
+
+## Secrets and configuration management
+
+Real model keys, database URLs, and third-party credentials must never
+appear in source code or version control. The standard pattern: load them
+at startup from environment variables or a secrets manager; pass them as
+explicit constructor arguments or dependency injection, not as globals. Keep
+a strict split between configuration that differs per environment (dev,
+staging, prod) and logic that does not. The loop, the policy seam, and the
+handler structure are identical across environments; only the backing
+credentials and endpoints change.
+
+## Canary and staged rollout
+
+Even a thoroughly evaluated agent should not go directly to full traffic.
+A canary deploy sends a small fraction of requests — typically one to ten
+percent — to the new version while the rest continue on the known-good
+version. Monitor error rates, latency, and task-success metrics (the same
+metrics your evaluation harness produces) over the canary window. If
+signals stay healthy, widen traffic incrementally. If they degrade, roll
+back immediately; stateless handlers make rollback a traffic-routing change,
+not a data migration.
+
+## Everything prior is a launch requirement
+
+Token budgets, guardrails, trace recorders, evaluation harnesses, retry
+logic, and fallback policies are not optional polish. They are launch
+requirements: an agent without budget enforcement can blow through API
+limits under production load; an agent without guardrails has no safe
+boundary in the real world; an agent without traces cannot be debugged when
+something goes wrong. The work of the preceding modules is the work of
+production readiness — and production is where it all composes into one
+handler.
+
+Next: **A Production-Shaped Handler**

@@ -1,0 +1,48 @@
+---
+title: "A Production-Shaped Handler"
+moduleId: "production"
+order: 2
+type: "interactive"
+summary: "A stateless handler composing budget, guardrail, and trace."
+estMinutes: 12
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** compose the course — a stateless `handle(request)` that
+checks a budget, guards the action, runs the policy, and returns a
+structured result. Swapping the mock for a real model changes nothing here.
+
+<PyRunner client:visible code={`ALLOWED = {"search", "answer"}
+
+def policy(req):
+    if "weather" in req:
+        return "search: weather"
+    return "answer: ok"
+
+def guard(action):
+    name = action.split(":")[0].strip()
+    return name in ALLOWED
+
+def handle(request, budget):
+    if budget <= 0:
+        return {"status": "rejected", "reason": "no_budget"}
+    action = policy(request)
+    if not guard(action):
+        return {"status": "blocked", "action": action}
+    return {"status": "ok", "action": action, "trace": [request, action]}
+
+for req, b in [("weather?", 1), ("hello", 1), ("weather?", 0)]:
+    print(handle(req, b))
+`} />
+
+`policy` is the Foundations `MockLLM` seam; `handle` is stateless —
+inputs in, structured result out, with budget, guardrail, and trace
+applied. Production swaps `policy` for a real model behind the same call;
+nothing else in `handle` changes.
+
+> **Best practice:** the request handler is pure orchestration of the
+> patterns you already built — keep it stateless and return structured
+> results, never raw model text.
+
+Next: **Going Further**

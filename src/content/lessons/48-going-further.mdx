@@ -1,0 +1,79 @@
+---
+title: "Going Further"
+moduleId: "production"
+order: 3
+type: "reading"
+summary: "Capstone framing and where real APIs and frameworks come in."
+estMinutes: 7
+---
+
+**Objective:** synthesise the curriculum and point to the real-integration next step and a capstone project.
+
+Every module in this course built one piece of the same machine. Now they
+are all in front of you at once. A loop that perceives and acts. A policy
+seam that separates orchestration from the decision-maker. Tools that let
+the agent reach outside itself. Retrieval that grounds answers in evidence.
+Memory that carries context across turns. A planner that breaks large goals
+into executable steps. Multi-agent coordination that distributes work across
+specialists. An evaluation harness that measures whether the agent actually
+solves the task. Guardrails that enforce safe boundaries on every action. A
+reliability layer of budgets, retries, and fallbacks. Observability that
+makes every run a replayable trajectory. And a stateless handler that
+composes it all for real traffic.
+
+## The through-line
+
+The through-line connecting all twelve modules is the same idea from
+Foundations: the loop calls the policy, the policy returns a decision, the
+loop acts on it. Everything else — retrieval, memory, planning, multi-agent
+coordination, evaluation — is scaffolding around that core. The scaffolding
+is important; it is the engineering that makes the core reliable, safe, and
+measurable in production. But the loop stays the same.
+
+That loop never changes. What changes is how sophisticated the policy
+becomes, how rich the context you pass to it is, how many tools it can
+reach for, and how carefully you measure and guard its behaviour.
+
+## The capstone: compose these for one real task
+
+The capstone project is simple in principle: pick one real task — document
+answering, data extraction, code review, customer triage, or anything else
+that matters to you — and compose the pieces you have built. Wire a real
+policy behind the seam. Add the tools the task requires. Plug in retrieval
+if the task is knowledge-intensive. Apply budgets and guardrails appropriate
+to the risk level. Instrument with traces. Run your evaluation harness
+against a golden set of cases. Deploy behind a stateless handler.
+
+You already know how every layer works. The capstone is integration: making
+sure they compose correctly for one specific, real problem.
+
+## Where real APIs and frameworks enter
+
+Real model APIs and orchestration frameworks slot in at the same seam you
+have used throughout — the policy boundary (real integration: subsystem D).
+A framework is a pre-built implementation of the loop, the tool registry,
+and often the memory layer; it does not change what you need to evaluate,
+guard, or observe. Choose a framework for its operational qualities —
+reliability, latency, cost transparency, observability hooks — not because
+it makes the architecture different, because it does not.
+
+SDK versions change, API shapes evolve, frameworks rise and are deprecated.
+The loop, the policy seam, the evaluation harness, and the guardrail layer
+are independent of any of that. You can migrate from one framework to
+another without touching your evals or your guardrails, because those live
+outside the implementation.
+
+> **Best practice:** frameworks change; the loop, the seam, evals, and
+> guardrails do not — those are the job.
+
+## Durable principles outlast SDK churn
+
+The principles in this curriculum are durable because they are structural,
+not syntactic. Statelessness is a design decision, not an API feature.
+Evaluation is a discipline, not a library call. Guardrails are a contract,
+not a middleware flag. Observability is an architecture — one event per step
+from day one — not a dashboard you bolt on later.
+
+You now have the full picture. The real work is building something with it.
+
+Next: **Production & Deployment Check**

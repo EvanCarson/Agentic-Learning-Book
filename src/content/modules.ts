@@ -73,4 +73,10 @@ export const modules: Module[] = [
     order: 11,
     summary: "Tracing the loop and replaying failed trajectories.",
   },
+  {
+    id: "production",
+    title: "Production & Deployment",
+    order: 12,
+    summary: "Statelessness, real-API integration, rollout, capstone.",
+  },
 ];
