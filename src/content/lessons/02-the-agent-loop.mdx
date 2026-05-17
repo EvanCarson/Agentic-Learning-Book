@@ -1,0 +1,42 @@
+---
+title: "The Agent Loop"
+moduleId: "foundations"
+order: 2
+type: "interactive"
+summary: "Build and run the perceive–decide–act loop in pure Python."
+estMinutes: 10
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** implement the perceive–decide–act loop and watch a policy
+drive actions from observations.
+
+The loop is the whole game. `decide` is the **policy** — here a trivial
+hardcoded rule. `agent_loop` is **perception + action**: it walks
+observations, asks the policy for an action, and reports it. Edit the code
+and press **Run** — this is real Python in your browser.
+
+<PyRunner client:visible code={`def decide(observation):
+    # a trivial policy: search if we don't know the answer
+    if "unknown" in observation:
+        return "search"
+    return "answer"
+
+def agent_loop(observations):
+    for obs in observations:
+        action = decide(obs)
+        print(f"obs={obs!r} -> action={action!r}")
+
+agent_loop(["unknown topic", "known fact", "unknown thing"])
+`} />
+
+`decide` is just `observation -> action`. That signature is the seam:
+keep it and you can replace the hardcoded rule with a model.
+
+> **Best practice:** never inline the decision into the loop. A named
+> `policy(observation) -> action` boundary is what makes the agent
+> testable and the model swappable.
+
+Next: **The Mock LLM** — replace the hardcoded rule with a controllable
+fake model.
