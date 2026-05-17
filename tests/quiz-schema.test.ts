@@ -23,16 +23,39 @@ describe("quizQuestionSchema", () => {
     expect(r.success).toBe(false);
   });
 
+  it("rejects a whitespace-only prompt", () => {
+    const r = quizQuestionSchema.safeParse({ ...valid, prompt: "   " });
+    expect(r.success).toBe(false);
+  });
+
   it("rejects an empty explanation", () => {
     const r = quizQuestionSchema.safeParse({ ...valid, explanation: "" });
     expect(r.success).toBe(false);
   });
 
-  it("rejects answerIndex out of range", () => {
+  it("rejects an option that is an empty string", () => {
+    const r = quizQuestionSchema.safeParse({
+      ...valid,
+      options: ["a", ""],
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("rejects a non-integer answerIndex", () => {
+    const r = quizQuestionSchema.safeParse({ ...valid, answerIndex: 1.5 });
+    expect(r.success).toBe(false);
+  });
+
+  it("rejects answerIndex out of range with an actionable message", () => {
     const r = quizQuestionSchema.safeParse({ ...valid, answerIndex: 3 });
     expect(r.success).toBe(false);
     if (!r.success) {
-      expect(r.error.issues[0].path).toEqual(["answerIndex"]);
+      expect(
+        r.error.issues.some((i) => i.path.join(".") === "answerIndex"),
+      ).toBe(true);
+      expect(
+        r.error.issues.some((i) => /out of range/.test(i.message)),
+      ).toBe(true);
     }
   });
 

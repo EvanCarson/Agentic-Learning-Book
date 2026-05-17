@@ -2,10 +2,10 @@ import { z } from "zod";
 
 export const quizQuestionSchema = z
   .object({
-    prompt: z.string().min(1),
-    options: z.array(z.string().min(1)).min(2),
+    prompt: z.string().trim().min(1),
+    options: z.array(z.string().trim().min(1)).min(2),
     answerIndex: z.number().int().nonnegative(),
-    explanation: z.string().min(1),
+    explanation: z.string().trim().min(1),
   })
   .superRefine((q, ctx) => {
     if (q.answerIndex >= q.options.length) {
