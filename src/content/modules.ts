@@ -55,4 +55,10 @@ export const modules: Module[] = [
     order: 8,
     summary: "Measuring agents: task success and trajectory checks.",
   },
+  {
+    id: "guardrails",
+    title: "Guardrails & Safety",
+    order: 9,
+    summary: "Validating inputs/outputs and executing tools safely.",
+  },
 ];
