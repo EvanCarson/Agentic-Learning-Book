@@ -3,40 +3,37 @@ title: "The Agent Loop"
 moduleId: "foundations"
 order: 2
 type: "interactive"
-summary: "Build and run the perceive–decide–act loop in pure Python."
+summary: "Run the perceive–decide–act loop — mock by default, or a real model with your key."
 estMinutes: 10
 ---
 
-import PyRunner from "../../components/PyRunner.tsx";
+import PolicyRunner from "../../components/PolicyRunner.tsx";
 
-**Objective:** implement the perceive–decide–act loop and watch a policy
-drive actions from observations.
+**Objective:** run the perceive–decide–act loop where `policy` is the
+swappable seam — the same loop, a deterministic mock by default or a real
+model behind the toggle.
 
-The loop is the whole game. `decide` is the **policy** — here a trivial
-hardcoded rule. `agent_loop` is **perception + action**: it walks
-observations, asks the policy for an action, and reports it. Edit the code
-and press **Run** — this is real Python in your browser.
+The loop is the whole game. `policy(observation) -> action` is provided by
+the runtime: **Mock** (default, deterministic, free) or **Real** (your own
+OpenAI-compatible key, called directly from your browser). The loop code
+below never changes — only what is behind `policy` does. That is the
+curriculum's thesis, made real.
 
-<PyRunner client:visible code={`def decide(observation):
-    # a trivial policy: search if we don't know the answer
-    if "unknown" in observation:
-        return "search"
-    return "answer"
-
-def agent_loop(observations):
-    for obs in observations:
-        action = decide(obs)
-        print(f"obs={obs!r} -> action={action!r}")
-
-agent_loop(["unknown topic", "known fact", "unknown thing"])
+<PolicyRunner client:visible code={`# policy(observation) -> action is injected by the runtime.
+# Mock by default; switch to Real above to use your own model.
+observations = ["unknown topic", "known fact", "unknown thing"]
+for obs in observations:
+    action = await policy(obs)
+    print(f"obs={obs!r} -> action={action!r}")
 `} />
 
-`decide` is just `observation -> action`. That signature is the seam:
-keep it and you can replace the hardcoded rule with a model.
+In **Mock** mode the policy returns `search` when the observation contains
+`"unknown"`, else `answer` — deterministic, so the output is always the
+same. Flip to **Real** and the identical loop drives a live model with
+your key; production is exactly this swap.
 
-> **Best practice:** never inline the decision into the loop. A named
-> `policy(observation) -> action` boundary is what makes the agent
-> testable and the model swappable.
+> **Best practice:** keep `policy(observation) -> action` as the only seam.
+> Mock it for fast deterministic tests; swap a real model behind it for
+> production — the loop never changes.
 
-Next: **The Mock LLM** — replace the hardcoded rule with a controllable
-fake model.
+Next: **The Mock LLM**
