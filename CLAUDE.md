@@ -97,7 +97,7 @@ CDN-blocked PyRunner test.
 - **Progress:** `src/lib/progress/` — `ProgressStore` interface,
   `LocalStorageProgressStore` implementation, `useProgress` React hook.
   localStorage now; Supabase later behind the same sync interface.
-- **React islands:** `Sidebar`, `Syllabus`, `MarkComplete`, `QuizStub`.
+- **React islands:** `Sidebar`, `Syllabus`, `MarkComplete`, `Quiz`.
 - **Python runner:** `src/components/PyRunner.tsx` — client island,
   lazy-loads Pyodide from CDN (pinned `0.27.2`) on first Run. Embed in MDX:
   `<PyRunner client:visible code={`...`} />`.
@@ -137,6 +137,10 @@ The lesson auto-appears in the sidebar and syllabus, ordered by module then
 > Caveats: a `moduleId` not present in `src/content/modules.ts` is **not**
 > caught by `npm run typecheck` — it fails at `npm run build` (the
 > integrity check runs in `getStaticPaths`). For `type: "quiz"` lessons,
-> the MDX body is intentionally suppressed: `LessonLayout` renders
-> `QuizStub` instead of the lesson body, so prose in a quiz `.mdx` file
-> will not be shown.
+> the MDX body is intentionally suppressed: `LessonLayout` renders the
+> `Quiz` island instead of the lesson body, so prose in a quiz `.mdx`
+> file will not be shown. `Quiz` reads schema-validated `questions` from
+> the lesson frontmatter; a quiz lesson with no `questions` renders a
+> graceful "coming soon" review note, and a passing submission (≥70%)
+> marks the lesson complete via the same `ProgressStore` seam as
+> `MarkComplete`.
