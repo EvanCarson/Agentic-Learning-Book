@@ -46,9 +46,7 @@ conditions.
 ## Turn the failure into a regression case
 
 Once you have isolated the bad step, extract the (observation, expected
-action) pair and add it to your evaluation suite. This is the same golden
-trajectory idea from the Evaluation & Testing module: a replay that asserts
-the correct action at the correct step. The test is cheap to run, fast to
+action) pair and add it to your evaluation suite. This follows the same approach as the Evaluation & Testing module: extract a golden-set case from the failure and add a trajectory check that asserts the correct action at the correct step. The test is cheap to run, fast to
 interpret, and permanently prevents the exact failure from silently
 re-emerging after a future change.
 

@@ -31,12 +31,12 @@ for obs in ["ok input", "error here", "ok again"]:
     print("step:", obs, "->", a)
 
 print("trace length =", len(t.events))
-print("replay:", [e["action"] for e in t.events])
+print("recorded actions:", [e["action"] for e in t.events])
 `} />
 
 `policy` is the Foundations `MockLLM` seam (a deterministic
 `observation -> action`); `Tracer` wraps each step so the trajectory
-becomes data you can print, assert on in tests, or replay.
+becomes data you can print, assert on in tests, or replay. This minimal recorder omits the timestamp and tool fields for clarity; production events add them.
 
 > **Best practice:** the trace is the debugging interface and the eval
 > input — structure it as data, never as free-form log strings.
