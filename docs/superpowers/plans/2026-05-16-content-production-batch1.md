@@ -382,6 +382,10 @@ mock gives the same interface with none of the nondeterminism. Every later
 module reuses exactly this seam; only the implementation behind it changes
 when real models arrive.
 
+This is the same `policy(observation) -> action` seam from the previous
+lesson, just named for the LLM's perspective: the `observation` is the
+prompt you hand the model, and the `action` is the response it returns.
+
 <PyRunner client:visible code={`class MockLLM:
     def __init__(self, table):
         self.table = table
