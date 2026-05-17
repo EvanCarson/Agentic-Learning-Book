@@ -1,0 +1,50 @@
+---
+title: "Structured Output"
+moduleId: "prompting"
+order: 2
+type: "interactive"
+summary: "Parse a constrained model response into a typed action."
+estMinutes: 11
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** make the policy return a *constrained* response and parse
+it into a `(kind, argument)` action your loop can trust.
+
+The mock returns strings shaped `KIND: argument`. The agent never acts on
+raw text — it parses, validates the `kind`, and only then proceeds.
+
+<PyRunner client:visible code={`VALID = {"TOOL", "ANSWER"}
+
+class MockLLM:
+    def __init__(self, table):
+        self.table = table
+
+    def __call__(self, prompt):
+        return self.table.get(prompt, "ANSWER: i_dont_know")
+
+def parse_action(response):
+    kind, sep, arg = response.partition(":")
+    kind = kind.strip()
+    if sep == "" or kind not in VALID:
+        return ("ANSWER", "unparseable")
+    return (kind, arg.strip())
+
+llm = MockLLM({
+    "weather in nyc?": "TOOL: get_weather",
+    "say hi": "ANSWER: hello",
+})
+
+for prompt in ["weather in nyc?", "say hi", "garbled"]:
+    print(prompt, "=>", parse_action(llm(prompt)))
+`} />
+
+Parsing + validating is the whole lesson: the model is untrusted input;
+the `(kind, argument)` tuple is the trusted contract your loop runs on.
+
+> **Best practice:** define the output grammar and a total parser with a
+> safe fallback. An unparseable response must degrade to a defined action,
+> never crash the loop.
+
+Next: **Prompting Pitfalls**.

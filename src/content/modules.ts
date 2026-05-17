@@ -13,4 +13,10 @@ export const modules: Module[] = [
     summary:
       "The agent loop, the LLM as decision policy, and the deterministic mock-LLM harness every later module builds on.",
   },
+  {
+    id: "prompting",
+    title: "Prompting & Control",
+    order: 2,
+    summary: "Turning model output into reliable, parseable decisions.",
+  },
 ];
