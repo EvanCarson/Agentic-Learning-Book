@@ -808,7 +808,8 @@ import PyRunner from "../../components/PyRunner.tsx";
 
 **Objective:** compose the whole course — a stateless `handle(request)`
 that budgets, guards, runs the policy, and returns a structured result.
-Swapping the mock for a real model (subsystem D) changes nothing here.
+Swapping the mock for a real model (real integration: subsystem D)
+changes nothing here.
 
 <PyRunner client:visible code={`ALLOWED = {"search", "answer"}
 
@@ -835,7 +836,8 @@ for req, b in [("weather?", 1), ("hello", 1), ("weather?", 0)]:
 
 `handle` is stateless: inputs in, structured result out, every cross-
 cutting concern (budget, guardrail, trace) applied. Production swaps
-`policy` for a real model behind the same call.
+`policy` for a real model (real integration: subsystem D) behind the
+same call.
 
 > **Best practice:** the request handler is pure orchestration of the
 > patterns you already built — keep it stateless and return structured
