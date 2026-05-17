@@ -621,7 +621,7 @@ action and execution: only allow-listed tools, and reject unsafe args.
 <PyRunner client:visible code={`ALLOWED = {"search", "calc"}
 
 def guard(action):
-    name, sep, arg = action.partition(":")
+    name, _, arg = action.partition(":")
     name = name.strip()
     arg = arg.strip()
     if name not in ALLOWED:
