@@ -85,23 +85,27 @@ test.describe("curriculum", () => {
 
   test("flagship lesson shows the model settings (mock default)", async ({ page }) => {
     await page.goto("/learn/02-the-agent-loop");
-    await expect(
-      page.getByRole("radio", { name: /Mock \(default/i }),
-    ).toBeChecked();
-    await expect(
-      page.getByRole("radio", { name: /Real \(your key/i }),
-    ).toBeVisible();
+    const mock = page.getByRole("radio", { name: /Mock \(default/i });
+    const real = page.getByRole("radio", { name: /Real \(your key/i });
+    await expect(mock).toBeChecked();
+    await real.check();
+    await expect(real).toBeChecked();
+    await expect(mock).not.toBeChecked();
   });
 
   test("API key field is a password input and is cleared on reload", async ({ page }) => {
     await page.goto("/learn/02-the-agent-loop");
-    await page.getByRole("radio", { name: /Real \(your key/i }).check();
+    const real = page.getByRole("radio", { name: /Real \(your key/i });
+    await real.check();
+    await expect(real).toBeChecked();
     const key = page.getByLabel("API key");
     await expect(key).toHaveAttribute("type", "password");
     await key.fill("sk-not-a-real-key");
     await expect(key).toHaveValue("sk-not-a-real-key");
     await page.reload();
-    await page.getByRole("radio", { name: /Real \(your key/i }).check();
+    const realAfter = page.getByRole("radio", { name: /Real \(your key/i });
+    await realAfter.check();
+    await expect(realAfter).toBeChecked();
     await expect(page.getByLabel("API key")).toHaveValue("");
   });
 });
