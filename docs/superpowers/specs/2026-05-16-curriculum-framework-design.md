@@ -142,7 +142,7 @@ independently testable.
 - Build-time: integrity check throws precise errors (offending
   lesson/module named) → fails `astro build` (not `astro check`, which
   only type-checks). `LessonLayout` additionally renders an explicit
-  `role="alert"` "unsupported lesson type" block for any non
+  `role="status"` "unsupported lesson type" block for any non
   reading/interactive/quiz type (defense even though the Zod enum
   constrains it).
 - `LocalStorageProgressStore`: try/catch around all storage access;
