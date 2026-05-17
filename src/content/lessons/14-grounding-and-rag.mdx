@@ -32,7 +32,7 @@ Documents are rarely fed whole. Chunking splits them into smaller units — para
 
 ## Embeddings as similarity scoring
 
-Keyword overlap is the simplest retrieval signal. Dense retrieval uses *embeddings*: both query and chunk are encoded as vectors, and similarity is cosine distance in that space. Semantically related text lands near each other even without shared keywords. Real embedding models are external API calls (real integration: subsystem D); keyword overlap captures the same structural pattern for learning.
+Keyword overlap is the simplest retrieval signal. Dense retrieval uses *embeddings*: both query and chunk are encoded as vectors, and similarity is measured by cosine similarity in that vector space. Semantically related text lands near each other even without shared keywords. Real embedding models are external API calls (real integration: subsystem D); keyword overlap captures the same structural pattern for learning.
 
 ## Retrieval as a tool
 
