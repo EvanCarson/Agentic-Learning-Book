@@ -16,6 +16,9 @@ export default function Quiz({
     questions.map(() => null),
   );
   const [submitted, setSubmitted] = useState(false);
+  // Latches once on the first passing submission; deliberately never reset
+  // by retry() so a later failed attempt cannot un-complete a lesson the
+  // learner has already passed.
   const completedRef = useRef(false);
 
   const result = submitted ? gradeQuiz(questions, answers) : null;
