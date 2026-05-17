@@ -2,7 +2,7 @@
 import BaseLayout from "./BaseLayout.astro";
 import Sidebar from "../components/Sidebar.astro";
 import MarkComplete from "../components/MarkComplete.tsx";
-import QuizStub from "../components/QuizStub.tsx";
+import Quiz from "../components/Quiz.tsx";
 import TrackVisit from "../components/TrackVisit.tsx";
 import type { Curriculum, LessonMeta, Adjacent } from "../lib/curriculum";
 
@@ -25,7 +25,12 @@ const { lesson, curriculum, adjacent } = Astro.props;
       </p>
       <h1>{lesson.title}</h1>
       {lesson.type === "quiz" ? (
-        <QuizStub client:load title={lesson.title} />
+        <Quiz
+          client:load
+          slug={lesson.slug}
+          title={lesson.title}
+          questions={lesson.questions ?? []}
+        />
       ) : lesson.type === "reading" || lesson.type === "interactive" ? (
         <slot />
       ) : (
