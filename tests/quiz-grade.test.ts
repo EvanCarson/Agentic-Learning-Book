@@ -38,7 +38,7 @@ describe("gradeQuiz", () => {
     const answers = [0, 0, 0, 0, 0, 0, 0, 1, 1, 1]; // 7/10
     const r = gradeQuiz(qs, answers);
     expect(r.correct).toBe(7);
-    expect(r.ratio).toBeCloseTo(0.7, 10);
+    expect(r.ratio).toBe(0.7); // 7/10 is bit-exact equal to the 0.7 literal
     expect(r.passed).toBe(true);
   });
 
@@ -65,6 +65,23 @@ describe("gradeQuiz", () => {
       ratio: 0,
       passed: false,
       perQuestion: [],
+    });
+  });
+
+  it("missing answers (answers shorter than questions) count as wrong", () => {
+    const r = gradeQuiz([q(0), q(1)], [0]); // answers[1] === undefined
+    expect(r.correct).toBe(1);
+    expect(r.perQuestion).toEqual([{ correct: true }, { correct: false }]);
+  });
+
+  it("ignores answers beyond the question count", () => {
+    const r = gradeQuiz([q(0)], [0, 1, 1]);
+    expect(r).toEqual({
+      correct: 1,
+      total: 1,
+      ratio: 1,
+      passed: true,
+      perQuestion: [{ correct: true }],
     });
   });
 });
