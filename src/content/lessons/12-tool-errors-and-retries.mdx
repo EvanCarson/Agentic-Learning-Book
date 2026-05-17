@@ -1,0 +1,42 @@
+---
+title: "Tool Errors & Retries"
+moduleId: "tools"
+order: 3
+type: "reading"
+summary: "Tools fail; the agent must observe failure and recover."
+estMinutes: 8
+---
+
+**Objective:** treat tool failure as a normal observation and design bounded recovery.
+
+## Failure is an observation
+
+A tool call can fail in at least three ways: the model supplies a malformed argument, the function raises an exception, or the underlying resource times out. None of these should end the agent run with an unhandled exception. Each failure is an **observation** — information the loop can act on. Feed it back to the policy the same way you feed back a successful result, and the policy can decide to retry with corrected arguments, try a different tool, or degrade gracefully.
+
+This reframe matters for how you write the runtime. A `try/except` around the tool call is not defensive programming — it is the contract. The result passed back to the policy is either a tool result or a structured error description. Both are valid observations. Neither should be silently swallowed.
+
+## Validate arguments before calling
+
+The cheapest failure to handle is a bad argument that never reaches the tool. Before dispatching a tool call, validate the argument against the tool's declared schema. A missing required field, a value outside the expected range, or a string where an integer is expected — these are detectable before any side effect occurs. Return a validation error as an observation immediately; the policy receives "argument `city` is required" rather than a Python traceback, and can adjust its next call.
+
+Validation also reduces the attack surface. An argument that passes your schema cannot, for example, escape a path constraint that your schema enforces. Declare the shape; validate the input; then call.
+
+## Bound retries with an attempt budget
+
+When the policy receives a failure observation and decides to retry, it must not loop indefinitely. Establish an **attempt budget** per task — a small integer (two to four attempts is usually sufficient) — and decrement it on each retry. When the budget reaches zero, the loop exits with whatever partial result it has accumulated.
+
+An unbounded retry loop is one of the most common sources of runaway agent cost. The model may confidently retry a call that will never succeed — a credential error, a resource that does not exist, a tool that is simply broken. The budget is not a pessimistic constraint; it is the correct default. If a task genuinely requires more attempts, raise the budget explicitly and with justification.
+
+## Idempotency enables safe retry
+
+A tool that can be called multiple times with the same arguments and produce the same result — or leave the system in the same state — is **idempotent**. Idempotent tools are safe to retry without additional bookkeeping. A `get_weather` call is naturally idempotent; a `charge_card` call is not. Design tools toward idempotency where the domain allows it, and flag non-idempotent tools explicitly so the retry policy can handle them differently.
+
+Real network and timeout wiring — connection pools, backoff intervals, circuit breakers — are production concerns (real integration: subsystem D). The pattern described here is independent of that infrastructure: failure goes back as an observation, budget decrements, the loop continues.
+
+## Degrade to a partial answer
+
+When the budget is exhausted and the tool has not succeeded, the agent should not crash or return nothing. Return the best partial answer the loop has accumulated: "I tried to fetch the weather but the service did not respond; here is what I know from other sources." A clean partial answer is far more useful than an unhandled exception, and it closes the loop with an honest signal the caller can act on.
+
+> **Best practice:** a failed tool call is data for the next decision, not an exception that ends the run — but always cap retries.
+
+Next: **Tool Use Check**

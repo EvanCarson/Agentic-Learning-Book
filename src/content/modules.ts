@@ -19,4 +19,10 @@ export const modules: Module[] = [
     order: 2,
     summary: "Turning model output into reliable, parseable decisions.",
   },
+  {
+    id: "tools",
+    title: "Tool Use",
+    order: 3,
+    summary: "Letting agents act through well-described, testable tools.",
+  },
 ];
