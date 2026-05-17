@@ -2,19 +2,12 @@
 import { getCollection, render } from "astro:content";
 import LessonLayout from "../../layouts/LessonLayout.astro";
 import { buildCurriculum, adjacent, type LessonMeta } from "../../lib/curriculum";
+import { toLessonMeta } from "../../lib/toLessonMeta";
 import { modules } from "../../content/modules";
 
 export async function getStaticPaths() {
   const entries = await getCollection("lessons");
-  const lessons: LessonMeta[] = entries.map((e) => ({
-    slug: e.id,
-    moduleId: e.data.moduleId,
-    order: e.data.order,
-    type: e.data.type,
-    title: e.data.title,
-    summary: e.data.summary,
-    estMinutes: e.data.estMinutes,
-  }));
+  const lessons: LessonMeta[] = entries.map(toLessonMeta);
   const curriculum = buildCurriculum(modules, lessons);
   return entries.map((entry) => {
     const lesson = lessons.find((l) => l.slug === entry.id)!;
