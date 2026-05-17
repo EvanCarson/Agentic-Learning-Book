@@ -25,4 +25,10 @@ export const modules: Module[] = [
     order: 3,
     summary: "Letting agents act through well-described, testable tools.",
   },
+  {
+    id: "rag",
+    title: "Retrieval & RAG",
+    order: 4,
+    summary: "Grounding answers in retrieved context with citations.",
+  },
 ];

@@ -1,0 +1,46 @@
+---
+title: "A Tiny Retriever"
+moduleId: "rag"
+order: 2
+type: "interactive"
+summary: "Build keyword retrieval + a grounded answer with a citation."
+estMinutes: 12
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** retrieve the most relevant document by simple word overlap,
+then answer only from it and cite its id.
+
+<PyRunner client:visible code={`DOCS = {
+    "d1": "the sky is blue because of rayleigh scattering",
+    "d2": "water boils at 100 celsius at sea level",
+    "d3": "python lists are ordered and mutable",
+}
+
+def score(query, text):
+    q = set(query.lower().split())
+    t = set(text.lower().split())
+    return len(q & t)
+
+def retrieve(query):
+    ranked = sorted(DOCS, key=lambda d: score(query, DOCS[d]), reverse=True)
+    return ranked[0]
+
+def answer(query):
+    doc_id = retrieve(query)
+    return "[" + doc_id + "] " + DOCS[doc_id]
+
+for q in ["why is the sky blue", "when does water boil", "are lists mutable"]:
+    print(q, "=>", answer(q))
+`} />
+
+Real systems swap word-overlap for embedding similarity (subsystem D),
+but the shape is identical: score, rank, answer only from the top chunk.
+The model — your `MockLLM`-style policy — never invents facts here; it is
+constrained to fetched context.
+
+> **Best practice:** return the source id with every grounded answer; an
+> answer with no retrievable source is a hallucination risk to flag.
+
+Next: **RAG Failure Modes**

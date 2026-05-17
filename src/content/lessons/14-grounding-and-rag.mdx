@@ -1,0 +1,43 @@
+---
+title: "Grounding & RAG"
+moduleId: "rag"
+order: 1
+type: "reading"
+summary: "Why retrieval beats memorisation: ground answers in fetched context."
+estMinutes: 8
+---
+
+**Objective:** explain RAG as "retrieve relevant context, then condition the answer on it" and why it cuts hallucination and enables citations.
+
+## Parametric vs retrieved knowledge
+
+A language model has two kinds of knowledge. *Parametric knowledge* is baked into the model's weights during training — it is frozen at the training cutoff, impossible to update without retraining, and unverifiable at inference time. *Retrieved knowledge* is fetched from a corpus at query time, passed into the context window as text, and can be current, source-attributed, and swapped out without touching the model.
+
+Most production failures that look like hallucinations are really parametric-knowledge failures: the model confidently extrapolates from training signal that is stale, incomplete, or wrong. Retrieval-Augmented Generation (RAG) is the engineering response: instead of asking the model to recall a fact, *give it the fact*, then ask it to reason over what you gave it.
+
+## The RAG shape
+
+A RAG pipeline has a fixed shape: **query → retrieve → assemble context → answer with citation**.
+
+1. A user query arrives.
+2. The retriever scores every candidate document (or *chunk*) against the query and returns the top-k.
+3. The top chunks are assembled into the context window alongside the query.
+4. The model generates an answer conditioned on that context and cites which chunk(s) support each claim.
+
+The model's job shifts from "recall this fact" to "read these passages and synthesise an answer." That is a fundamentally more verifiable task: if the answer is not supported by a retrieved chunk, the gap is visible.
+
+## Chunking
+
+Documents are rarely fed whole. A long article may contain one relevant paragraph; feeding all ten thousand words wastes context budget and dilutes the signal. Chunking splits documents into smaller units — paragraphs, fixed token windows, or semantic sections — that can be scored individually. Chunk size is a tuning variable: too small and a chunk loses context; too large and retrieval precision falls. A common starting point is 256–512 tokens with a small overlap between adjacent chunks to preserve sentence boundaries.
+
+## Embeddings as similarity scoring
+
+Keyword overlap is the simplest retrieval signal. Dense retrieval replaces it with *embeddings*: both the query and each chunk are encoded as vectors, and similarity is cosine distance in that space. Semantically related text lands near each other even with no shared keywords. Real embedding models are external API calls (real integration: subsystem D); for learning and prototyping, keyword overlap captures the same structural pattern.
+
+## Retrieval as a tool
+
+From the agent's perspective, retrieval is just another tool in the registry (see the Tool Use module). The agent calls `retrieve(query)`, receives a list of chunks with source ids, and uses those chunks — and only those chunks — to produce its answer. This composability is why RAG generalises naturally to agentic systems: the agent can call the retriever multiple times, refine its query, and cite exactly which source supports each claim.
+
+> **Best practice:** ground every factual claim in a retrieved chunk and carry its source id through to the answer — a claim with no attributable source is a hallucination risk waiting to surface.
+
+Next: **A Tiny Retriever**
