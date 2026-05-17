@@ -17,7 +17,7 @@ The failure mode is subtle at first and catastrophic at scale. A slightly differ
 
 ## The instruction is part of the policy
 
-A common mistake is treating the system prompt as decoration — a polite preamble before the "real" call. It is not. The instruction is an integral component of the policy. Change the instruction and you change the policy, just as surely as swapping the model weights. This means the instruction must be authored with the same care as code: it specifies the contract the rest of the loop depends on.
+A common mistake is treating the instruction as decoration — a polite preamble before the "real" call. It is not. The instruction is an integral component of the policy. Change the instruction and you change the policy, just as surely as swapping the model weights. This means the instruction must be authored with the same care as code: it specifies the contract the rest of the loop depends on.
 
 The most powerful thing an instruction can do is constrain the *shape* of the output. Instead of asking the model to "decide what to do," ask it to respond with exactly one of a small set of forms — a verb plus an argument, a keyword followed by a value, a line that starts with a declared prefix. When the grammar is small, a parser can be total: it handles every possible response, including malformed ones, and maps them to a known, safe action.
 
@@ -27,7 +27,7 @@ A useful pattern is to restrict the model to responses of the form `KIND: argume
 
 The contract is then deterministic even if the model is not. The model may choose `TOOL: get_weather` or `TOOL:get_weather` (with or without a space), but a well-written parser handles both and returns the same structured value. Validate before acting: check that the extracted kind is in the allowed set before dispatching. The loop runs on the validated tuple, not on the raw string.
 
-> **Best practice:** never `eval` or branch on raw model prose. Declare an output grammar, write a total parser with a safe fallback for every unparseable case, and act only on the validated, structured result.
+> **Best practice:** never branch on raw model prose — or, worse, execute it via `eval`. Parse a declared, validated shape instead.
 
 ## The contract, not the model, is deterministic
 

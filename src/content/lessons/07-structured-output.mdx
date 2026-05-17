@@ -41,6 +41,9 @@ for prompt in ["weather in nyc?", "say hi", "garbled"]:
     print(prompt, "=>", parse_action(llm(prompt)))
 `} />
 
+This `MockLLM` is the same seam from Foundations, here named `llm` for
+the model's perspective — the agent still just calls it.
+
 Parsing + validating is the whole lesson: the model is untrusted input;
 the `(kind, argument)` tuple is the trusted contract your loop runs on.
 
@@ -48,4 +51,4 @@ the `(kind, argument)` tuple is the trusted contract your loop runs on.
 > safe fallback. An unparseable response must degrade to a defined action,
 > never crash the loop.
 
-Next: **Prompting Pitfalls**.
+Next: **Prompting Pitfalls**
