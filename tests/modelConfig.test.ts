@@ -3,6 +3,7 @@ import {
   getModelConfig,
   setModelConfig,
   forgetKey,
+  subscribeModelConfig,
   DEFAULT_BASE_URL,
   DEFAULT_MODEL,
 } from "../src/lib/modelConfig";
@@ -34,6 +35,16 @@ describe("modelConfig", () => {
     const c = getModelConfig();
     expect(c.apiKey).toBe("");
     expect(c.mode).toBe("real");
+  });
+
+  it("notifies subscribers and stops after unsubscribe", () => {
+    let n = 0;
+    const unsub = subscribeModelConfig(() => { n += 1; });
+    setModelConfig({ mode: "real" });
+    expect(n).toBe(1);
+    unsub();
+    setModelConfig({ apiKey: "sk-y" });
+    expect(n).toBe(1);
   });
 
   it("does not touch web storage", () => {
