@@ -1,0 +1,81 @@
+---
+title: "Timeouts, Retries & Fallback"
+moduleId: "reliability"
+order: 3
+type: "reading"
+summary: "Bounded retries, timeouts, and graceful degradation."
+estMinutes: 8
+---
+
+**Objective:** explain reliability patterns for unreliable model and tool calls.
+
+A deployed agent calls external services: a language model endpoint, a search
+API, a database, a third-party tool. Every one of those calls can be slow,
+transiently unavailable, or silently wrong. Without explicit reliability
+handling, a single hung call stalls the entire run; a single 500 response
+aborts work that was otherwise complete. The patterns below apply to any
+external call, model or otherwise.
+
+## Timeouts on every external call
+
+The first rule is mechanical: every network call carries a timeout. A call
+with no timeout will wait indefinitely if the remote end stalls. In an agent
+loop that means the user waits indefinitely, resources remain held, and no
+upstream budget or deadline can fire. Setting an explicit timeout converts
+"wait forever" into a defined error your loop can handle like any other.
+
+Timeout values should reflect expected latency at the p95–p99 level, not the
+median. A value too tight produces spurious failures on legitimate slow
+responses; a value too loose defeats the purpose. The right value comes from
+observed latency distributions, not guesswork.
+
+Real network call configuration — connection timeouts, read timeouts, socket
+options — wires through the provider client or an HTTP library (real
+integration: subsystem D).
+
+## Bounded retries with backoff
+
+A timed-out or rate-limited call is often worth retrying. The key word is
+bounded: fix a maximum retry count before the first attempt, not after a
+failure spiral. Three retries is a common ceiling; more than five is rarely
+justified and amplifies load on an already-stressed downstream service.
+
+Spacing retries with increasing delay — exponential backoff — reduces the
+chance of hammering a service that is recovering. Adding a small random
+offset (jitter) prevents multiple concurrent agents from retrying in lockstep
+and producing a thundering herd. The conceptual shape is: wait, then wait
+longer, then stop (real integration: subsystem D).
+
+## Idempotency makes retries safe
+
+Retrying a call is only safe if repeating it does not produce a different or
+harmful side effect. Read and query operations are typically idempotent by
+nature. Write and action operations require deliberate design: assign a
+unique identifier to each logical action and have the receiver de-duplicate
+on it. Without idempotency, a network timeout that triggers a retry can
+execute an action twice.
+
+## Fallback model or answer
+
+When retries are exhausted, the loop needs a defined next step. Options in
+increasing order of degradation: switch to a smaller, cheaper model that is
+less likely to be under load; return a cached answer from a prior run; return
+a partial result with an explanation; return a safe default. The choice
+depends on the task, but any of these is better than an unhandled exception.
+
+> **Best practice:** every external call has a timeout, a retry cap, and a
+> fallback — no unbounded waits, ever.
+
+## Circuit breaking
+
+If failures are persistent — a downstream service is down, not just slow —
+continuing to attempt calls wastes budget and delays recovery. A circuit
+breaker tracks the recent failure rate and stops attempting calls once the
+rate crosses a threshold, letting the failed service recover before load
+resumes. The circuit is "open" (calls skip directly to fallback), and it
+closes again after a probe interval shows the service healthy. This pattern
+composes with the budget and cache from the previous lesson: together they
+form a loop that spends deliberately, handles failure gracefully, and stops
+rather than spiralling.
+
+Next: **Cost, Latency & Reliability Check**

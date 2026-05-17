@@ -61,4 +61,10 @@ export const modules: Module[] = [
     order: 9,
     summary: "Validating inputs/outputs and executing tools safely.",
   },
+  {
+    id: "reliability",
+    title: "Cost, Latency & Reliability",
+    order: 10,
+    summary: "Budgets, caching, timeouts, retries, and fallback.",
+  },
 ];
