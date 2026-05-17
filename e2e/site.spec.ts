@@ -21,7 +21,9 @@ test.describe("landing", () => {
 test.describe("curriculum", () => {
   test("syllabus lists modules in order with their lessons", async ({ page }) => {
     await page.goto("/learn");
-    const headings = page.getByRole("heading", { level: 2 });
+    const headings = page
+      .getByRole("main")
+      .getByRole("heading", { level: 2 });
     await expect(headings.nth(0)).toHaveText("Foundations");
     await expect(headings.nth(1)).toHaveText("Patterns & Best Practices");
     await expect(
@@ -39,6 +41,11 @@ test.describe("curriculum", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Tool Use" }),
     ).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Curriculum" })
+        .locator('a[aria-current="page"]'),
+    ).toHaveAttribute("href", "/learn/04-tool-use");
   });
 
   test("mark complete persists across reload", async ({ page }) => {
