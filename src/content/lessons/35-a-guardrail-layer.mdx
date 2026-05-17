@@ -31,7 +31,7 @@ for a in ["search: cats", "delete: db", "calc: 2+2", "search: ../etc"]:
 
 The policy — your Foundations `MockLLM` seam — may *propose* anything;
 this deterministic guard decides what actually runs. A blocked action
-returns a defined result the loop can handle; it never throws.
+returns a defined result the loop can handle; it never throws. The path check here illustrates the principle; production argument validation uses a schema or a dedicated library, not ad hoc substring scanning.
 
 > **Best practice:** allow-list, don't deny-list; validate arguments
 > structurally; a blocked action is a normal, logged outcome.
