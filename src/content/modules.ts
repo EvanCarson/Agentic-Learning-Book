@@ -11,12 +11,6 @@ export const modules: Module[] = [
     title: "Foundations",
     order: 1,
     summary:
-      "What an agent is and the perceive–decide–act loop that powers it.",
-  },
-  {
-    id: "patterns",
-    title: "Patterns & Best Practices",
-    order: 2,
-    summary: "Common agentic patterns and how to apply them well.",
+      "The agent loop, the LLM as decision policy, and the deterministic mock-LLM harness every later module builds on.",
   },
 ];
