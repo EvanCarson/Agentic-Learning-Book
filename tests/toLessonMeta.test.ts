@@ -23,5 +23,34 @@ describe("toLessonMeta", () => {
       summary: "The loop.",
       estMinutes: 10,
     });
+    expect(
+      toLessonMeta(entry as Parameters<typeof toLessonMeta>[0]).questions,
+    ).toBeUndefined();
+  });
+
+  it("carries a questions array through when present", () => {
+    const entry = {
+      id: "05-foundations-check",
+      data: {
+        title: "Foundations Check",
+        moduleId: "foundations",
+        order: 5,
+        type: "quiz" as const,
+        summary: "Check.",
+        estMinutes: 4,
+        questions: [
+          {
+            prompt: "Q?",
+            options: ["a", "b"],
+            answerIndex: 1,
+            explanation: "because",
+          },
+        ],
+      },
+    };
+    const meta = toLessonMeta(entry as Parameters<typeof toLessonMeta>[0]);
+    expect(meta.questions).toEqual([
+      { prompt: "Q?", options: ["a", "b"], answerIndex: 1, explanation: "because" },
+    ]);
   });
 });

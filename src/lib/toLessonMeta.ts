@@ -10,5 +10,6 @@ export function toLessonMeta(entry: CollectionEntry<"lessons">): LessonMeta {
     title: entry.data.title,
     summary: entry.data.summary,
     estMinutes: entry.data.estMinutes,
+    questions: entry.data.questions,
   };
 }

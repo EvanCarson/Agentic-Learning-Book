@@ -1,4 +1,5 @@
 import type { Module } from "../content/modules";
+import type { QuizQuestion } from "./quiz/grade";
 
 export type LessonType = "reading" | "interactive" | "quiz";
 
@@ -10,6 +11,7 @@ export interface LessonMeta {
   title: string;
   summary: string;
   estMinutes: number;
+  questions?: QuizQuestion[];
 }
 
 export interface ModuleWithLessons extends Module {
