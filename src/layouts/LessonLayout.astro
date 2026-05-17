@@ -29,7 +29,7 @@ const { lesson, curriculum, adjacent } = Astro.props;
       ) : lesson.type === "reading" || lesson.type === "interactive" ? (
         <slot />
       ) : (
-        <p role="alert">Unsupported lesson type: {lesson.type}</p>
+        <p role="status">Unsupported lesson type: {lesson.type}</p>
       )}
       <div class="mt-8 not-prose">
         <MarkComplete client:load slug={lesson.slug} />
