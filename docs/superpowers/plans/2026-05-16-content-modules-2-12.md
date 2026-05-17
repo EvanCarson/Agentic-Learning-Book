@@ -8,7 +8,7 @@
 
 **Tech Stack:** Astro 6 content collections (B, unchanged), MDX, PyRunner (unchanged), Vitest (15, unchanged — no logic). Verification per task: `npx astro check` 0/0/0 + `npm run build` green; the networked Playwright suite (controller-run) stays 7/7 (Foundations slugs/anchor untouched).
 
-**Conventions (locked by the E spec; every reading/interactive lesson):** explicit `**Objective:**` first line; concept/mechanics-first, durable, framework-agnostic; real APIs/frameworks described conceptually tagged "(real integration: subsystem D)"; one `> **Best practice:**` callout; a closing `Next: **<next lesson title>**` forward link (last lesson of a module points to the next module's first lesson; Module 12's last content lesson points to its quiz). Interactive lessons: stdlib-only, deterministic, authored at 4-space indentation that stays valid after the documented MDX 2→space normalization (shallow nesting only). Quiz lessons: stub body (LessonLayout renders QuizStub); conventions/estMinutes range do not apply.
+**Conventions (locked by the E spec; every reading/interactive lesson):** explicit `**Objective:**` first line; concept/mechanics-first, durable, framework-agnostic; real APIs/frameworks described conceptually tagged "(real integration: subsystem D)"; one `> **Best practice:**` callout; a closing `Next: **<next lesson title>**` forward link (last lesson of a module points to the next module's first lesson; Module 12's last content lesson points to its quiz). The forward link form is EXACTLY `Next: **<Title>**` — no trailing period, no description clause — uniformly across Modules 2–12. Every interactive lesson includes one sentence bridging back to the Module-1 `MockLLM` seam (same seam, possibly renamed for perspective). Prefer durable vocabulary (e.g. say "instruction", not "system prompt"; the latter is a real-API message role deferred to subsystem D). Interactive lessons: stdlib-only, deterministic, authored at 4-space indentation that stays valid after the documented MDX 2→space normalization (shallow nesting only). Quiz lessons: stub body (LessonLayout renders QuizStub); conventions/estMinutes range do not apply.
 
 **Slug numbering:** Foundations used `01`–`05`. New lessons continue a global running prefix `06`…`49`; the frontmatter `order` is the within-module position (1-based). Filenames: `src/content/lessons/<NN>-<slug>.mdx`.
 
@@ -131,6 +131,9 @@ for prompt in ["weather in nyc?", "say hi", "garbled"]:
     print(prompt, "=>", parse_action(llm(prompt)))
 `} />
 
+This `MockLLM` is the same seam from Foundations, here named `llm` for
+the model's perspective — the agent still just calls it.
+
 Parsing + validating is the whole lesson: the model is untrusted input;
 the `(kind, argument)` tuple is the trusted contract your loop runs on.
 
@@ -138,7 +141,7 @@ the `(kind, argument)` tuple is the trusted contract your loop runs on.
 > safe fallback. An unparseable response must degrade to a defined action,
 > never crash the loop.
 
-Next: **Prompting Pitfalls**.
+Next: **Prompting Pitfalls**
 ````
 Deterministic output: `weather in nyc? => ('TOOL', 'get_weather')` / `say hi => ('ANSWER', 'hello')` / `garbled => ('ANSWER', 'unparseable')`.
 
