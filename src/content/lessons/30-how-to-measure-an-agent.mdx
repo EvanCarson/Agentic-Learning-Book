@@ -49,7 +49,7 @@ decision (real integration: subsystem D).
 LLM judges are powerful but introduce their own biases. They tend to favour
 verbose, confident-sounding outputs; they can be sensitive to the order in
 which options are presented; and their verdicts vary across runs unless
-temperature is fixed. Use LLM judges for nuanced dimensions that resist
+temperature and seed are fixed. Use LLM judges for nuanced dimensions that resist
 exact matching, but calibrate them against human ratings and monitor
 judge-model drift when you upgrade the underlying model.
 

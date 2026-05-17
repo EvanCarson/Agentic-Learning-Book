@@ -49,6 +49,10 @@ The harness is just: run every case, compare to the label, aggregate.
 Everything sophisticated (judges, trajectory checks) is a richer
 comparator wrapped around this same loop.
 
+The same loop measures retrieval `recall@k`: the case label is whether the
+expected document appears in the top-k retrieved, and the comparator checks
+membership instead of equality.
+
 > **Best practice:** start every agent with a tiny golden set and a pass
 > rate in CI; grow the set from every production failure.
 
