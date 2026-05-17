@@ -82,4 +82,26 @@ test.describe("curriculum", () => {
     await page.goto("/tutorials/01-what-is-an-agent");
     await expect(page).toHaveURL(/\/learn\/01-what-is-an-agent\/?$/);
   });
+
+  test("flagship lesson shows the model settings (mock default)", async ({ page }) => {
+    await page.goto("/learn/02-the-agent-loop");
+    await expect(
+      page.getByRole("radio", { name: /Mock \(default/i }),
+    ).toBeChecked();
+    await expect(
+      page.getByRole("radio", { name: /Real \(your key/i }),
+    ).toBeVisible();
+  });
+
+  test("API key field is a password input and is cleared on reload", async ({ page }) => {
+    await page.goto("/learn/02-the-agent-loop");
+    await page.getByRole("radio", { name: /Real \(your key/i }).check();
+    const key = page.getByLabel("API key");
+    await expect(key).toHaveAttribute("type", "password");
+    await key.fill("sk-not-a-real-key");
+    await expect(key).toHaveValue("sk-not-a-real-key");
+    await page.reload();
+    await page.getByRole("radio", { name: /Real \(your key/i }).check();
+    await expect(page.getByLabel("API key")).toHaveValue("");
+  });
 });
