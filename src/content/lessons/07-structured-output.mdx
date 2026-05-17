@@ -34,6 +34,7 @@ def parse_action(response):
 llm = MockLLM({
     "weather in nyc?": "TOOL: get_weather",
     "say hi": "ANSWER: hello",
+    "garbled": "??? no colon here",
 })
 
 for prompt in ["weather in nyc?", "say hi", "garbled"]:
