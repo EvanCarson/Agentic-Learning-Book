@@ -67,4 +67,10 @@ export const modules: Module[] = [
     order: 10,
     summary: "Budgets, caching, timeouts, retries, and fallback.",
   },
+  {
+    id: "observability",
+    title: "Observability & Debugging",
+    order: 11,
+    summary: "Tracing the loop and replaying failed trajectories.",
+  },
 ];
