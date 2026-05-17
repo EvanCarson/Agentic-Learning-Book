@@ -11,7 +11,7 @@ import PyRunner from "../../components/PyRunner.tsx";
 
 **Objective:** compose the course — a stateless `handle(request)` that
 checks a budget, guards the action, runs the policy, and returns a
-structured result. Swapping the mock for a real model changes nothing here.
+structured result. Swapping the mock for a real model (real integration: subsystem D) changes nothing here.
 
 <PyRunner client:visible code={`ALLOWED = {"search", "answer"}
 
@@ -38,7 +38,7 @@ for req, b in [("weather?", 1), ("hello", 1), ("weather?", 0)]:
 
 `policy` is the Foundations `MockLLM` seam; `handle` is stateless —
 inputs in, structured result out, with budget, guardrail, and trace
-applied. Production swaps `policy` for a real model behind the same call;
+applied. Production swaps `policy` for a real model (real integration: subsystem D) behind the same call;
 nothing else in `handle` changes.
 
 > **Best practice:** the request handler is pure orchestration of the
