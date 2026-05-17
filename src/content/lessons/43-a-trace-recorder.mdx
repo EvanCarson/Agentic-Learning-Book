@@ -1,0 +1,44 @@
+---
+title: "A Trace Recorder"
+moduleId: "observability"
+order: 2
+type: "interactive"
+summary: "Record a structured trace of each loop step, then replay it."
+estMinutes: 11
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** wrap a step so every decision is recorded as a structured
+event; the recorded trace can be printed and replayed.
+
+<PyRunner client:visible code={`class Tracer:
+    def __init__(self):
+        self.events = []
+
+    def step(self, obs, action):
+        self.events.append({"obs": obs, "action": action})
+        return action
+
+def policy(obs):
+    if "error" in obs:
+        return "retry"
+    return "answer"
+
+t = Tracer()
+for obs in ["ok input", "error here", "ok again"]:
+    a = t.step(obs, policy(obs))
+    print("step:", obs, "->", a)
+
+print("trace length =", len(t.events))
+print("recorded actions:", [e["action"] for e in t.events])
+`} />
+
+`policy` is the Foundations `MockLLM` seam (a deterministic
+`observation -> action`); `Tracer` wraps each step so the trajectory
+becomes data you can print, assert on in tests, or replay. This minimal recorder omits the timestamp and tool fields for clarity; production events add them.
+
+> **Best practice:** the trace is the debugging interface and the eval
+> input — structure it as data, never as free-form log strings.
+
+Next: **Debugging From Traces**

@@ -1,0 +1,68 @@
+---
+title: "Evaluation Pitfalls"
+moduleId: "evaluation"
+order: 3
+type: "reading"
+summary: "Overfitting to the eval set, judge bias, and flaky cases."
+estMinutes: 8
+---
+
+**Objective:** the ways evaluation misleads and how to keep it honest.
+
+## Overfitting the prompt to the golden set
+
+The most common eval failure is invisible: you tune the agent's instructions
+against the same cases you measure it on, and the pass rate climbs without
+the agent actually getting better. This is **eval overfitting**. The golden
+set stops being a probe of generalisation and becomes a memorisation target.
+The fix is a strict separation between the cases you iterate on during
+development and the cases you report as your metric. Ideally, a separate
+person authors the held-out set — if the developer who writes the
+instructions also writes all the test cases, overfitting is almost certain.
+
+## Non-deterministic outputs and flaky CI
+
+Agents that call a language model at evaluation time produce different
+outputs on different runs unless you pin the sampling behaviour. Flaky tests
+— cases that pass sometimes and fail sometimes — are worse than no tests:
+they erode trust in the suite and train developers to ignore failures
+(real integration: subsystem D). Fix this by routing evaluation through a
+deterministic mock, or by pinning temperature and seed when the real model
+must be used. If neither is possible, run each case multiple times and
+aggregate — but document the variance budget explicitly.
+
+## LLM-judge bias and variance
+
+LLM judges carry the biases of their training data and the prompt you give
+them. Common failure modes: favouring longer outputs; favouring the
+instruction-style of the judge's own training distribution; giving different
+verdicts for the same input when the presentation order of options changes.
+You can detect these by running the same cases through multiple judges,
+flipping the presentation order, and comparing against a small set of human
+labels. A judge whose inter-rater agreement with humans is unknown is not a
+metric — it is a guess dressed as a number.
+
+## Eval-set drift vs production
+
+A golden set authored at launch reflects the distribution of inputs at
+launch. Production traffic shifts: new query patterns, new user phrasing,
+new edge cases. An agent whose pass rate on the original golden set is
+stable but whose production error rate is rising is experiencing **eval-set
+drift**. Counter this by sampling production failures into the golden set
+regularly — the same "add every incident" discipline that keeps a regression
+suite honest over time.
+
+## Trajectory, not just the final answer
+
+For agentic tasks — multi-step, tool-calling sequences — the final answer
+hides most of the interesting failure modes. An agent that retrieves the
+wrong evidence but happens to guess the right answer will pass a
+task-success check and fail in production as soon as the lucky coincidence
+does not repeat. Measure the trajectory: which tools were called, in which
+order, with which arguments. A trajectory check that asserts "retrieval
+before generation" catches the failure that the output check misses.
+
+> **Best practice:** hold out cases the prompt author never sees — a metric
+> you optimise against stops measuring.
+
+Next: **Evaluation & Testing Check**

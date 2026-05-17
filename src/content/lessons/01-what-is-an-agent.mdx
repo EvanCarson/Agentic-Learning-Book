@@ -2,31 +2,56 @@
 title: "What Is an Agent?"
 moduleId: "foundations"
 order: 1
-type: "interactive"
-summary: "The perceive–decide–act loop, run in your browser."
-estMinutes: 10
+type: "reading"
+summary: "What this track covers, how the hands-on works, and what an agent actually is."
+estMinutes: 8
 ---
 
-import PyRunner from "../../components/PyRunner.tsx";
+**Objective:** understand what this track teaches, how the in-browser
+exercises work, and the one definition the rest of the curriculum builds on.
 
-An **agent** is a system that repeatedly *perceives* its environment,
-*decides* what to do, and *acts* — then observes the result and loops again.
+## What this track covers
 
-The simplest possible agent is just that loop. Edit the code below and
-press **Run** — this executes real Python in your browser, no server.
+A job-ready path for software engineers becoming AI engineers who ship
+agentic systems. It is deliberately framework-agnostic: you learn the
+mechanics that stay true across SDKs and model versions. The full map:
 
-<PyRunner client:visible code={`def decide(observation):
-    # a trivial policy: search if we don't know the answer
-    if "unknown" in observation:
-        return "search"
-    return "answer"
+1. **Foundations** — the agent loop and the mock-LLM harness *(you are here)*
+2. Prompting & Control
+3. Tool Use
+4. Retrieval & RAG
+5. Memory & State
+6. Planning & Reasoning
+7. Multi-Agent Systems
+8. Evaluation & Testing
+9. Guardrails & Safety
+10. Cost, Latency & Reliability
+11. Observability & Debugging
+12. Production & Deployment
 
-def agent_loop(observations):
-    for obs in observations:
-        action = decide(obs)
-        print(f"obs={obs!r} -> action={action!r}")
+## How the hands-on works
 
-agent_loop(["unknown topic", "known fact", "unknown thing"])
-`} />
+Interactive lessons run **real Python in your browser** — no install, no
+keys, no cost — so you can focus on mechanics. Each agent's policy is a
+**deterministic mock LLM** you control: the same interface as a real
+model, fully reproducible. Calling real model APIs and frameworks is a
+production concern covered later; the *patterns* you learn here are
+identical either way.
 
-Next, we'll give this agent **tools** so its actions can affect the world.
+## What an agent is
+
+An **agent** is a system that repeatedly **perceives** its environment,
+**decides** what to do, and **acts** — then observes the result and loops
+again. The decision step is where a model (here, a mock) acts as the
+**policy**.
+
+Internalize this distinction: a plain LLM call is a single function
+`prompt -> text`. An agent is a *loop* that calls a policy repeatedly,
+feeds results back in, and stops on a goal or a budget. Tools, memory,
+planning, multi-agent — every later topic is a refinement of that loop.
+
+> **Best practice:** treat the policy as a swappable dependency from day
+> one. If your loop only knows "call `policy(observation)`", you can test
+> it with a mock today and drop in a real model later with no rewrite.
+
+Next: **The Agent Loop** — build this loop in Python and run it.

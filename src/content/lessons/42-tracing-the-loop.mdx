@@ -1,0 +1,80 @@
+---
+title: "Tracing the Loop"
+moduleId: "observability"
+order: 1
+type: "reading"
+summary: "You can't debug what you can't see: structured traces per step."
+estMinutes: 8
+---
+
+**Objective:** explain why agent debugging requires structured per-step traces and replayable trajectories.
+
+A traditional program fails in one place. Fix the line, add a test, move
+on. An agent loop fails across time: the wrong retrieval at step two leads
+to a bad plan at step four, which produces an incorrect answer at step
+seven. By the time the failure surfaces, the evidence is buried in a pile
+of log lines — or gone entirely if logging was an afterthought. Print
+statements don't help when behaviour is non-deterministic across runs.
+
+## Non-determinism breaks print debugging
+
+Model outputs vary with temperature, with version drift, with upstream
+changes in retrieved documents. The exact run that produced the bug cannot
+be re-created by re-running the code. Print debugging assumes you can
+reproduce; agents routinely violate that assumption. You need to record
+while the run is live, not reconstruct after the fact.
+
+## One structured event per loop step
+
+The solution is to emit one structured record — an *event* — at every step
+of the loop. At minimum, an event captures the observation the agent
+received, the action it chose, and a timestamp. In practice you also record
+the tool invoked, the raw result returned, token counts, and latency. Keep
+the fields machine-readable from day one: a JSON object or a dataclass, not
+a formatted string.
+
+Structured events compose into a *trajectory*: the ordered sequence of
+events for a single run. A trajectory is a complete, queryable record of
+what the agent saw and decided. You can print it, filter it, diff it
+against a passing run, or feed it directly to an evaluation harness.
+
+> **Best practice:** emit one structured event per loop step from day one;
+> a run you can't replay is a run you can't fix.
+
+## Correlation ids
+
+Every event should carry a *run id* — a random identifier minted at the
+start of the run and propagated to every event in that trajectory. When a
+single task spawns sub-agents or parallel tool calls, each child gets its
+own id that references the parent. Correlation ids let you filter a trace
+store for all events belonging to one run, or reconstruct the causal tree
+of a multi-agent job.
+
+## Replaying a failed trajectory
+
+Given a stored trajectory you can replay the run deterministically: feed
+each recorded observation back through the policy in order and compare the
+actions it produces now against the actions it produced then. If a code
+change causes a previously correct step to regress, replay surfaces it
+immediately. If a step was already wrong, replay isolates which observation
+triggered it. Replay turns a vague "it gave the wrong answer" into a
+precise "it gave the wrong action at step N given this exact observation".
+
+## Metrics derived from traces
+
+Structured events are also the source for operational metrics: mean steps
+per run, tool error rates, p95 latency per step type, budget utilisation.
+Aggregating across runs reveals trends — a tool that started erroring more
+often, a planner that started taking more steps than before. Real-time
+dashboards and alert rules sit on top of the same event stream that powers
+debugging (real integration: subsystem D).
+
+## Real tracing backends
+
+Production agents route events to distributed tracing platforms and
+specialised LLM observability tools that index trajectories, highlight
+anomalies, and expose replay (real integration: subsystem D). The local
+recorder you build next is the same abstraction — one structured event per
+step — that those platforms consume at scale.
+
+Next: **A Trace Recorder**

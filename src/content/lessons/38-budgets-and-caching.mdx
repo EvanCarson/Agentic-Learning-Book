@@ -1,0 +1,63 @@
+---
+title: "Budgets & Caching"
+moduleId: "reliability"
+order: 1
+type: "reading"
+summary: "Token/cost models, caching, and why every loop needs a budget."
+estMinutes: 8
+---
+
+**Objective:** explain the cost/latency model of agent loops and the first levers (budgets, caching).
+
+Every call to a language model is a transaction: tokens in and out map
+directly to money and latency. In a single-turn chat that cost is bounded. In
+an agent loop it multiplies. A planning step, three tool calls, a reflection,
+and a final synthesis can consume five or more round-trips. If a step spawns
+sub-agents or re-queries on failure, the multiplier grows further.
+
+## Each step costs tokens and time
+
+Input tokens cover the instruction, history, retrieved chunks, and accumulated
+tool results. Output tokens cover reasoning and the proposed action. Both add
+up within a step; across steps, context grows because earlier results stay in
+the window. A loop that does not prune its context can hit the model's limit
+before the task finishes — and overspend on every call along the way.
+
+Real provider token pricing and in-flight token counting connect through
+dedicated client libraries (real integration: subsystem D).
+
+## A hard budget per run
+
+The simplest reliability improvement is an explicit budget every run carries:
+a step count, a token count, or both. When the budget is exhausted the agent
+stops and returns whatever partial result it has rather than continuing
+indefinitely. A budget is not just a cost control; it is a safety property —
+a runaway agent is a reliability failure before it is a financial one.
+
+> **Best practice:** every agent run carries an explicit budget; exceeding it
+> degrades gracefully, it doesn't run forever.
+
+## Caching identical calls
+
+Many workloads issue the same call repeatedly: the same chunk summarised
+twice, the same classification on repeated inputs, the same instruction on
+every message. A cache keyed on the exact prompt skips the model call for a
+hit — zero extra tokens, zero extra latency. Even a shallow in-process cache
+eliminates a large fraction of spend in loops that re-query on failures.
+
+Batching is a related lever: submitting independent calls together rather than
+sequentially cuts wall-clock time and, on some providers, per-call overhead
+(real integration: subsystem D).
+
+## The cheapest call is the one you don't make
+
+Before you spend a token, check whether you already have the answer. Prepend
+a fast deterministic check — a cache lookup, a rule, a pre-computed result —
+in front of every model call. The check costs microseconds; a model
+round-trip costs hundreds of milliseconds and real money.
+
+Budget and cache together form the first reliability layer: caps prevent
+runaway spending; caches prevent redundant spending. The next lesson builds
+both into the loop directly.
+
+Next: **Caching & Budgets**

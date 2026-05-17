@@ -1,0 +1,39 @@
+---
+title: "What Is a Tool?"
+moduleId: "tools"
+order: 1
+type: "reading"
+summary: "The act step: a tool is a named, described, validated function."
+estMinutes: 8
+---
+
+**Objective:** define a tool as the agent's action surface and the contract a tool must present.
+
+## Tools are the "act" step
+
+Every agent loop iterates three phases: **perceive** an observation, **decide** what to do, **act** on that decision. Until now the "act" step has been a simple return value — the policy prints an answer and the loop stops. Tools extend that step into the world: a tool call is the agent writing a file, querying a database, fetching a URL, or calling any other external operation you choose to expose.
+
+The perceive-decide-act cycle makes the role of a tool precise. The model *decides* — it selects which tool to invoke and what argument to pass. The runtime *acts* — it executes the registered function and returns a result. That result is the next observation, fed back into the loop. The model never reaches outside the cycle on its own; every side-effect is mediated by a tool you own.
+
+## The tool contract
+
+A tool is not just a Python function. It is a **named, described, typed, deterministic unit** the policy can reason about. The contract has four parts:
+
+1. **Name** — a short, unambiguous identifier the model uses to select this tool. Names should read like verbs: `get_weather`, `search_documents`, `write_file`.
+2. **Description** — a natural-language sentence the model reads to understand *when* to use the tool and *what it does*. This description is part of the instruction; author it with the same care as code. Vague descriptions produce wrong selections.
+3. **Typed arguments** — each tool accepts a declared, validated argument shape. Validation happens in your runtime, before execution, every time. An argument that does not match the schema is an error the loop can handle; an unvalidated argument reaching a database or file system is a vulnerability.
+4. **Deterministic implementation** — given the same arguments, a tool should return the same result (or a stable, predictable error). Side-effectful tools (network calls, file writes) should be designed for idempotency where possible and isolated for testing. Real network and I/O wiring is a production concern (real integration: subsystem D).
+
+## The model selects; your registry executes
+
+A critical security and correctness property: **the model never executes arbitrary code**. It selects a name from the set of tools you have registered and proposes an argument. Your runtime maps that name to a function in your registry and calls it. If the name is not in the registry, that is an observable error — not a crash, not an eval.
+
+This means the attack surface for a tool-using agent is exactly the set of tools you register. A well-designed registry is small, with each tool doing one thing well. Large, vague tools are harder to describe, harder to test, and harder to reason about — both for you and for the model.
+
+> **Best practice:** keep each tool small, independently testable, and precisely described — the model only chooses the tool by name; argument parsing and execution are your code, not the model's.
+
+## Tools are individually testable
+
+Because a tool is a plain function with declared inputs and outputs, it can be tested without a model, without a loop, and without any agent infrastructure. Write unit tests for each tool in isolation before wiring it into the registry. A tool that is hard to test in isolation is a tool whose contract is unclear — fix the contract, then the test becomes easy.
+
+Next: **A Tool-Using Loop**

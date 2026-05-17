@@ -1,0 +1,26 @@
+---
+title: "When Multiple Agents?"
+moduleId: "multi-agent"
+order: 1
+type: "reading"
+summary: "Roles, supervisor/worker, handoffs — and when one agent is better."
+estMinutes: 8
+---
+
+**Objective:** explain when decomposition into multiple specialised agents helps vs adds coordination cost, and the supervisor/worker pattern.
+
+A multi-agent system is several distinct policies working together: each agent has its own instruction, its own set of tools, and a bounded scope of responsibility. A coordinator — the supervisor — decides which agent handles which subtask and assembles the results. This arrangement differs from one agent with many tools: each worker can be developed, tested, and replaced independently, and the supervisor's routing logic stays clean because it never does the work itself.
+
+**The supervisor/worker pattern.** The supervisor receives a high-level goal, breaks it into typed subtasks, and routes each subtask to a worker whose role matches. A math worker handles numerical reasoning; a retrieval worker handles search; a writing worker drafts prose. The supervisor does not know how each worker accomplishes its task — it only knows the task type and the worker's declared role. Workers return results to the supervisor, which then assembles them into a final output (or passes them to the next worker in sequence).
+
+**Handoffs.** A handoff is the act of passing an observation — what has happened so far — plus a scoped goal to another agent. The scoped goal must be self-contained: the receiving agent should not need to re-read the entire conversation history. A well-designed handoff is a short context plus a clear, narrow instruction. Poorly scoped handoffs cause workers to ask clarifying questions, retry, or produce outputs that don't fit back into the supervisor's plan.
+
+**Shared-state risks.** When multiple agents write to the same resource — a file, a database row, a shared memory slot — you get race conditions. In practice, design agents to be read-heavy and write-light. If writes are unavoidable, route them through a single writer: either the supervisor, or a dedicated state-management agent that serialises all updates. Message passing (return results rather than mutating shared state) eliminates most of these risks entirely.
+
+**When to stay with one agent.** Most tasks do not need multiple agents. A single agent with several tools handles the majority of real workloads: calling a weather API, querying a database, writing a summary. Adding a supervisor and two workers for a task that one agent can do in three tool calls multiplies your latency, your cost, and your debugging surface for no gain. Apply YAGNI here with discipline: reach for multi-agent architecture only when the roles are genuinely distinct and cannot share a single instruction without becoming incoherent.
+
+> **Best practice:** reach for multi-agent only when roles are genuinely distinct — a tool is cheaper than an agent and far easier to debug.
+
+The coordination overhead of a multi-agent system is real: the supervisor is an extra model call, every handoff is a context serialisation, and a failure in one worker may produce a result the supervisor cannot gracefully handle. That overhead has to be paid back by the gains from specialisation and parallelism. If it cannot, one agent with tools is the right answer.
+
+Next: **A Supervisor & Workers**

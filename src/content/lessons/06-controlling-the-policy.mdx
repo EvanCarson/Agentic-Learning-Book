@@ -1,0 +1,36 @@
+---
+title: "Controlling the Policy"
+moduleId: "prompting"
+order: 1
+type: "reading"
+summary: "Why raw model text is unreliable and how instructions + structure fix it."
+estMinutes: 8
+---
+
+**Objective:** explain why free-form model output is unsafe to act on and how an instruction plus a constrained output shape make the policy reliable.
+
+## The problem with free text
+
+An agent loop needs to *act* on what the policy returns. When that return value is unconstrained natural language, acting on it correctly becomes guesswork. Does "I'll get the weather for you" mean call the weather tool? Does "you should check the temperature" mean the same thing? A loop that branches on prose is brittle: it relies on every future response using the same phrasing, in the same position, in the same sentence structure — an assumption no model guarantees.
+
+The failure mode is subtle at first and catastrophic at scale. A slightly different phrasing silently routes to the wrong branch. A model version update changes wording conventions. Output that worked in testing fails in production for inputs no test covered. When you act on raw prose, you have surrendered control of your system's behavior to the model's stylistic choices.
+
+## The instruction is part of the policy
+
+A common mistake is treating the instruction as decoration — a polite preamble before the "real" call. It is not. The instruction is an integral component of the policy. Change the instruction and you change the policy, just as surely as swapping the model weights. This means the instruction must be authored with the same care as code: it specifies the contract the rest of the loop depends on.
+
+The most powerful thing an instruction can do is constrain the *shape* of the output. Instead of asking the model to "decide what to do," ask it to respond with exactly one of a small set of forms — a verb plus an argument, a keyword followed by a value, a line that starts with a declared prefix. When the grammar is small, a parser can be total: it handles every possible response, including malformed ones, and maps them to a known, safe action.
+
+## Constrain to a small grammar
+
+A useful pattern is to restrict the model to responses of the form `KIND: argument` where `KIND` is drawn from a fixed set (for example, `TOOL` or `ANSWER`). The parser reads the prefix, validates it against the set, and extracts the argument. Any response that does not match falls through to a safe default — never to a crash, never to undefined behavior.
+
+The contract is then deterministic even if the model is not. The model may choose `TOOL: get_weather` or `TOOL:get_weather` (with or without a space), but a well-written parser handles both and returns the same structured value. Validate before acting: check that the extracted kind is in the allowed set before dispatching. The loop runs on the validated tuple, not on the raw string.
+
+> **Best practice:** never branch on raw model prose — or, worse, execute it via `eval`. Parse a declared, validated shape instead.
+
+## The contract, not the model, is deterministic
+
+This is the core insight of this module: you cannot make the model itself deterministic, but you can make the *contract* between the model and your loop deterministic. The instruction specifies the grammar; the parser enforces it; the loop runs on the result. Model updates, temperature variation, and prompt sensitivity are all absorbed at the parsing layer. Your downstream logic stays stable.
+
+Next: **Structured Output**

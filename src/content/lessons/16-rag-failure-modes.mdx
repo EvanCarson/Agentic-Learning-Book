@@ -1,0 +1,40 @@
+---
+title: "RAG Failure Modes"
+moduleId: "rag"
+order: 3
+type: "reading"
+summary: "Bad retrieval, stale context, and context-stuffing limits."
+estMinutes: 8
+---
+
+**Objective:** recognise where RAG breaks and the engineering responses.
+
+## When retrieval goes wrong
+
+RAG relocates the hallucination failure point: instead of inventing a fact from weights, the model cites a retrieved chunk that was irrelevant, stale, or wrong. The answer is still confidently delivered. Understanding each failure mode is a prerequisite for building a pipeline you can trust.
+
+## Irrelevant retrieval
+
+The most common failure: a chunk looks related but is not useful. Keyword overlap and embeddings both surface off-topic passages that share vocabulary with the query. The model will extract *something* from an irrelevant chunk rather than admit it lacks a source. Measure **recall@k**: what fraction of queries return a relevant chunk in the top k? Poor recall@k produces wrong answers regardless of model quality.
+
+## Chunk size mismatches
+
+Chunk size fails in both directions. Too small: surrounding context is lost — "it is the most abundant gas" is meaningless without the sentence naming the gas. Too large: a chunk with one relevant sentence among nineteen irrelevant ones dilutes the signal. Iterate chunk size against retrieval quality; 256–512 tokens with small overlap is a start, not an answer.
+
+## Stale indices
+
+An index is only as current as its last update. For domains where correctness depends on recency — pricing, policies, guidelines — staleness is a correctness bug. Explicit freshness tracking and automated re-indexing are the fix.
+
+## Context budget and "lost in the middle"
+
+Retrieved text competes with the query, instruction, and history for context budget. Research shows models reliably use information at the *beginning* and *end* of long contexts but miss the middle. Ten chunks pasted in is often worse than three high-precision chunks; re-rank before assembly and keep the context lean.
+
+## "I don't have a source for that"
+
+A well-designed RAG system makes "no supporting source" a first-class answer. When the retriever returns nothing relevant, an explicit refusal is safer than falling back to parametric knowledge. A high rate of "no source" responses signals a corpus gap — actionable, not a model failure.
+
+Recall@k and answer groundedness are the metrics that matter here. Neither appears in standard benchmarks. Building lightweight evaluation harnesses for both — even with a small labelled set — is the fastest path to fixing failures; this is explored in the Evaluation & Testing module.
+
+> **Best practice:** make "no supporting source" a first-class answer and measure retrieval quality explicitly — assuming the retriever works correctly is how confidently wrong answers get shipped.
+
+Next: **Retrieval & RAG Check**

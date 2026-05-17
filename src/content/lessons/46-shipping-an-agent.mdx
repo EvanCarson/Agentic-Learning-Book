@@ -1,0 +1,69 @@
+---
+title: "Shipping an Agent"
+moduleId: "production"
+order: 1
+type: "reading"
+summary: "Statelessness, real-API integration, config, and rollout."
+estMinutes: 9
+---
+
+**Objective:** explain what changes when the agent leaves the notebook — statelessness, real model/tool wiring, config/secrets, and staged rollout.
+
+Building an agent in a notebook is easy: interpreter memory holds state
+and a bug means re-running a cell. Production is a different contract.
+Requests arrive from outside, processes restart between them, secrets must
+be managed carefully, and a bad deploy reaches real users at scale.
+
+## Stateless request handlers
+
+A production agent runs inside a stateless handler: each request arrives
+cold, carries everything the agent needs, and returns a structured result
+before the handler exits. No per-user or per-run state survives between
+calls.
+
+This is an asset. Stateless handlers scale horizontally and restart
+cleanly. Anything that must persist lives outside: conversation history in
+an external store, working memory in a durable cache — the same pattern as
+the Memory & State module, now backed by a real service.
+
+## Real API integration at the seam
+
+Every module built the policy as a deterministic `MockLLM`. The policy is
+a seam — a boundary between the loop's orchestration logic and its
+decision-maker. In production you swap the implementation behind that seam
+for a real model call (real integration: subsystem D). Tool integrations
+plug in at the same seam used for mock tools since Module 3 (real
+integration: subsystem D). Nothing in the loop changes.
+
+> **Best practice:** the seam you mocked since Module 1 is the exact swap
+> point for real models — production changes the implementation behind it,
+> not your loop.
+
+## Secrets and configuration management
+
+Model API keys and third-party credentials must never appear in source
+code. Load them at startup from environment variables or a secrets manager;
+inject them explicitly, not as globals. Configuration that varies per
+environment (dev, staging, prod) is strictly separate from logic — the
+loop, the seam, and the handler structure stay identical; only credentials
+and endpoints change.
+
+## Canary and staged rollout
+
+Even a thoroughly evaluated agent should not go directly to full traffic.
+A canary deploy routes a small fraction of requests — typically one to ten
+percent — to the new version while the rest stay on the known-good version.
+Monitor error rates, latency, and task-success metrics from your evaluation
+harness. If signals hold, widen traffic. If they degrade, roll back;
+stateless handlers make rollback a routing decision, not a migration.
+
+## Everything prior is a launch requirement
+
+Token budgets, guardrails, trace recorders, evaluation harnesses, and
+fallback policies are not optional polish — they are launch requirements.
+An agent without budget enforcement can exhaust API limits under load; one
+without guardrails has no safety boundary; one without traces cannot be
+debugged when something goes wrong. Every prior module was production
+readiness work.
+
+Next: **A Production-Shaped Handler**

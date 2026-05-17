@@ -1,0 +1,50 @@
+---
+title: "A Plan-Execute Loop"
+moduleId: "planning"
+order: 2
+type: "interactive"
+summary: "Generate a plan, execute each step, and collect the results."
+estMinutes: 12
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** turn a goal into an ordered plan, execute each step, and
+collect the step results — the plan-execute pattern.
+
+<PyRunner client:visible code={`PLANS = {
+    "trip": ["weather", "pack", "book"],
+}
+
+def do_step(step):
+    return step + ":done"
+
+class MockPlanner:
+    def __init__(self, plans):
+        self.plans = plans
+
+    def __call__(self, goal):
+        return self.plans.get(goal, [])
+
+planner = MockPlanner(PLANS)
+
+def run(goal):
+    plan = planner(goal)
+    print("plan for", goal, "=", plan)
+    results = []
+    for step in plan:
+        results.append(do_step(step))
+    print("results =", results)
+
+run("trip")
+`} />
+
+`MockPlanner` is the Foundations `MockLLM` seam in planner clothing: a
+deterministic `goal -> plan`. A real planner is a model call with the
+same shape. Keeping planning and execution separate means a bad plan is
+inspectable and replaceable without touching the executor.
+
+> **Best practice:** keep planning and execution as separate units — you
+> should be able to inspect or swap the plan without changing how steps run.
+
+Next: **Reflection & Its Limits**

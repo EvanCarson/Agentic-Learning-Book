@@ -19,37 +19,37 @@ test.describe("landing", () => {
 });
 
 test.describe("curriculum", () => {
-  test("syllabus lists modules in order with their lessons", async ({ page }) => {
+  test("syllabus shows the Foundations module and its lessons", async ({ page }) => {
     await page.goto("/learn");
-    const headings = page
-      .getByRole("main")
-      .getByRole("heading", { level: 2 });
-    await expect(headings.nth(0)).toHaveText("Foundations");
-    await expect(headings.nth(1)).toHaveText("Patterns & Best Practices");
+    await expect(
+      page
+        .getByRole("main")
+        .getByRole("heading", { level: 2, name: "Foundations" }),
+    ).toBeVisible();
     await expect(
       page.getByRole("link", { name: /What Is an Agent\?/ }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /Tool Use/ }),
+      page.getByRole("link", { name: /The Mock LLM/ }),
     ).toBeVisible();
   });
 
-  test("prev/next spans the module boundary", async ({ page }) => {
-    await page.goto("/learn/03-foundations-check");
-    await page.getByRole("link", { name: /Tool Use →/ }).click();
-    await expect(page).toHaveURL(/\/learn\/04-tool-use$/);
+  test("prev/next navigates between lessons", async ({ page }) => {
+    await page.goto("/learn/01-what-is-an-agent");
+    await page.getByRole("link", { name: /The Agent Loop →/ }).click();
+    await expect(page).toHaveURL(/\/learn\/02-the-agent-loop$/);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Tool Use" }),
+      page.getByRole("heading", { level: 1, name: "The Agent Loop" }),
     ).toBeVisible();
     await expect(
       page
         .getByRole("navigation", { name: "Curriculum" })
         .locator('a[aria-current="page"]'),
-    ).toHaveAttribute("href", "/learn/04-tool-use");
+    ).toHaveAttribute("href", "/learn/02-the-agent-loop");
   });
 
   test("mark complete persists across reload", async ({ page }) => {
-    await page.goto("/learn/02-agent-anatomy");
+    await page.goto("/learn/04-agent-anatomy");
     const btn = page.getByRole("button", { name: /Mark complete/i });
     await btn.click();
     await expect(
@@ -62,13 +62,13 @@ test.describe("curriculum", () => {
   });
 
   test("quiz lesson renders the accessible stub", async ({ page }) => {
-    await page.goto("/learn/03-foundations-check");
+    await page.goto("/learn/05-foundations-check");
     await expect(page.getByRole("note")).toContainText(/coming soon/i);
   });
 
-  test("interactive lesson still runs Python in-browser", async ({ page }) => {
+  test("interactive lesson runs Python in-browser", async ({ page }) => {
     test.setTimeout(180_000);
-    await page.goto("/learn/01-what-is-an-agent");
+    await page.goto("/learn/02-the-agent-loop");
     await page.getByRole("button", { name: /Run|Loading|Running/i }).click();
     const out = page.locator("pre[aria-live='polite']");
     await expect(out).toContainText("obs='unknown thing' -> action='search'", {

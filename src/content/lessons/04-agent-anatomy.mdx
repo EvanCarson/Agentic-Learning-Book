@@ -1,0 +1,31 @@
+---
+title: "Anatomy of an Agent"
+moduleId: "foundations"
+order: 4
+type: "reading"
+summary: "Perception, policy, action, and memory — the four separable parts."
+estMinutes: 7
+---
+
+**Objective:** name the four parts every agent has and know why keeping
+them separable is the first engineering best practice.
+
+Every agent, however simple, has four moving parts:
+
+- **Perception** — turn the environment into an observation the policy can use.
+- **Policy** — decide the next action from that observation (the model, or a mock).
+- **Action** — affect the world: a tool call, an answer, a step.
+- **Memory** — carry state across loop iterations.
+
+In the loop you built, perception was "take the next observation", the
+policy was `decide` / the mock LLM, the action was the printed result, and
+memory was implicit (none yet). Later modules expand each part: tools
+(action), retrieval and state (memory), planning (policy).
+
+> **Best practice:** keep these four as separable units with narrow
+> interfaces. You can then test the policy without a real environment,
+> swap perception or tools without rewriting the loop, and reason about
+> failures one part at a time. Tangling them is the most common reason an
+> agent codebase becomes untestable.
+
+Next: **Foundations Check**

@@ -1,0 +1,63 @@
+---
+title: "Going Further"
+moduleId: "production"
+order: 3
+type: "reading"
+summary: "Capstone framing and where real APIs and frameworks come in."
+estMinutes: 7
+---
+
+**Objective:** synthesise the curriculum and point to the real-integration next step and a capstone project.
+
+Every module built one piece of the same machine: a loop that perceives
+and acts; a policy seam separating orchestration from the decision-maker;
+tools that let the agent reach the world; retrieval that grounds answers;
+memory that carries context across turns; planning for large goals;
+multi-agent coordination; evaluation; guardrails; a reliability layer of
+budgets, retries, and fallbacks; observability; and a stateless handler
+that composes it all for real traffic.
+
+## The through-line
+
+The through-line across all twelve modules is the same idea from
+Foundations: the loop calls the policy, the policy returns a decision, the
+loop acts on it. Everything else is scaffolding that makes the core
+reliable, safe, and measurable. The loop does not change. What changes is
+how capable the policy becomes, how rich the context you give it, and how
+carefully you evaluate and guard its decisions.
+
+## The capstone: compose these for one real task
+
+Pick one real task — document answering, data extraction, code review, or
+anything that matters to you — and compose the pieces you have built. Wire
+a real policy behind the seam. Add the tools the task needs. Plug in
+retrieval if it is knowledge-intensive. Apply budgets and guardrails
+appropriate to the risk. Instrument with traces. Run your evaluation
+harness against a golden set. Deploy behind a stateless handler.
+
+You already know how each layer works. The capstone is integration: making
+them compose correctly for one specific problem.
+
+## Where real APIs and frameworks enter
+
+Real model APIs and orchestration frameworks slot in at the policy seam
+(real integration: subsystem D). A framework is a pre-built implementation
+of the loop, the tool registry, and often the memory layer — it does not
+change what you need to evaluate, guard, or observe. SDK versions change,
+frameworks are deprecated; you can migrate without touching your evals or
+your guardrails because those live outside the implementation.
+
+> **Best practice:** frameworks change; the loop, the seam, evals, and
+> guardrails do not — those are the job.
+
+## Durable principles outlast SDK churn
+
+The principles in this curriculum are structural, not syntactic.
+Statelessness is a design decision. Evaluation is a discipline. Guardrails
+are a contract. Observability is an architecture — one event per step from
+day one, not a dashboard bolted on later. They outlast any particular SDK
+or provider.
+
+You now have the full picture. The real work is building something with it.
+
+Next: **Production & Deployment Check**

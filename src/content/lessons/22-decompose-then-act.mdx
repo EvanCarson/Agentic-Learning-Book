@@ -1,0 +1,28 @@
+---
+title: "Decompose, Then Act"
+moduleId: "planning"
+order: 1
+type: "reading"
+summary: "Plan-execute and reflection: when single-step ReAct isn't enough."
+estMinutes: 8
+---
+
+**Objective:** explain decomposition (plan then execute steps) and reflection (critique then revise), and when each is worth its added cost.
+
+The agent loop you built in Foundations is already a reasoning policy: the model observes, decides, and acts, step by step. For many tasks that is exactly enough. Ask for the current weather, the model calls a weather tool, and you are done in one step. Single-step ReAct works well when each action is independent and the goal has no internal structure.
+
+Some tasks are different. Writing a research report, booking a multi-leg trip, or migrating a codebase all share a property: later steps depend on the outcomes of earlier ones, and the full sequence of actions cannot be committed to until partway through. Running the agent loop blindly over these tasks leads to wasted calls, inconsistent intermediate states, and outputs that never hang together as a whole.
+
+**A plan as ordered subgoals.** Decomposition means generating the list of subgoals before executing any of them. A plan is an ordered sequence of named steps, each with a clear completion criterion. The planner does one thing: take a high-level goal and return that list. The executor does another thing: run one agent-loop pass per subgoal, in order, using the result of each as context for the next. Keeping the two roles separate is what makes the pattern inspectable — if a run goes wrong, you can tell whether the plan was wrong or the execution was wrong.
+
+**Executing the plan.** Each subgoal becomes the instruction to the inner agent loop. The executor calls the loop, collects the result, and passes it forward to the next subgoal's context. At the end it combines the per-step results into a final output. This outer loop is deterministic bookkeeping; the intelligence lives in the planner and in the per-step model calls. A real planner is a model call with a prompt that asks for a structured list (real integration: subsystem D).
+
+**Reflection: critique then revise.** After executing a plan you can optionally evaluate the result — not just check for errors, but ask whether the output actually achieves the original goal. If not, the reflector proposes revisions to the plan or to specific step results, and the loop runs again. This is the reflect pattern: generate → evaluate → revise → repeat.
+
+**The cost tradeoff.** Every planning pass and every reflection iteration adds latency and model calls. For a one-step task, a planner multiplies your cost by at least two (plan + execute) before any reflection. That overhead is only worthwhile when a task reliably requires multiple dependent steps; if you add planning to every call you will pay the premium constantly and recover value rarely.
+
+> **Best practice:** add planning only when a task reliably needs multiple dependent steps — it multiplies cost and failure surface.
+
+Measure before you commit: run the task with and without the planning layer and compare success rates. If the single-step path succeeds 90% of the time, the planner needs to bring that close to 100% to justify its overhead. If it only pushes you to 92%, skip it. The same logic applies to reflection layers — each iteration must earn its token spend.
+
+Next: **A Plan-Execute Loop**

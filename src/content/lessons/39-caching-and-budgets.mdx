@@ -1,0 +1,45 @@
+---
+title: "Caching & Budgets"
+moduleId: "reliability"
+order: 2
+type: "interactive"
+summary: "Add a response cache and a hard call budget to the loop."
+estMinutes: 11
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** wrap the policy with a cache (skip repeat calls) and a hard
+budget (stop before runaway cost).
+
+<PyRunner client:visible code={`class Budgeted:
+    def __init__(self, table, budget):
+        self.table = table
+        self.budget = budget
+        self.calls = 0
+        self.cache = {}
+
+    def __call__(self, prompt):
+        if prompt in self.cache:
+            return self.cache[prompt] + " (cached)"
+        if self.calls >= self.budget:
+            return "budget_exceeded"
+        self.calls = self.calls + 1
+        out = self.table.get(prompt, "unknown")
+        self.cache[prompt] = out
+        return out
+
+llm = Budgeted({"a": "1", "b": "2"}, budget=2)
+for p in ["a", "a", "b", "c"]:
+    print(p, "->", llm(p))
+`} />
+
+`Budgeted` wraps the Foundations `MockLLM` seam: same `prompt -> response`
+call, now with a cache and a hard ceiling. A repeated prompt is served
+from cache (no spend); once the fresh-call budget is hit, new prompts
+degrade to `budget_exceeded` instead of costing more.
+
+> **Best practice:** cache by exact input, count only uncached calls
+> against the budget, and make budget exhaustion a defined response.
+
+Next: **Timeouts, Retries & Fallback**

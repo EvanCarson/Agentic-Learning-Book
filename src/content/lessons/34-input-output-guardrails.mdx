@@ -1,0 +1,69 @@
+---
+title: "Input & Output Guardrails"
+moduleId: "guardrails"
+order: 1
+type: "reading"
+summary: "Validate what goes into and comes out of the policy."
+estMinutes: 8
+---
+
+**Objective:** explain the guardrail layers around an agent — input validation, output validation, and tool-call authorisation.
+
+An agent sits at the centre of several data flows it did not originate. User
+messages arrive from a browser or API client. Retrieved chunks come from a
+document store. Tool results return from external services. Every one of these
+paths can carry malformed, adversarial, or simply unexpected content. Guardrails
+are the deterministic code boundaries you place around the non-deterministic
+policy to handle all of it.
+
+## Inputs deserve validation before the policy sees them
+
+Treat the agent loop as a pipeline. Before you hand anything to the policy,
+normalise it: check length limits so a runaway retrieval result does not blow
+the context window; strip or escape control characters that could confuse a
+structured-output parser; enforce schema contracts on tool return values.
+Validation here is cheap and synchronous — far cheaper than diagnosing a
+downstream failure caused by corrupted context.
+
+User content is untrusted by definition. Retrieved and tool-fetched data is
+equally untrusted: it was assembled from sources outside your control, and it
+may embed instructions intended to redirect the agent. Normalise all of it
+through the same boundary.
+
+## Outputs deserve validation before they execute
+
+The policy emits a proposed action — a tool name and arguments, or a text
+response. That proposal is a candidate, not a command. Before anything runs,
+a second validation boundary checks the output:
+
+- Is the requested tool name on the allow-list?
+- Do the arguments satisfy structural constraints (correct types, no path
+  traversal, no SQL metacharacters)?
+- Is the proposed response within the channel's content policy?
+
+Rejecting a proposed action here is a normal, logged event. The agent loop
+receives a defined "blocked" result and can retry, escalate, or stop gracefully.
+The key property is that nothing executes until the guardrail clears it.
+
+## Allow/deny policies and defence in depth
+
+Allow-listing tools is more robust than deny-listing: anything not explicitly
+permitted is blocked, and a new tool cannot accidentally become available
+without an explicit decision. The same principle applies to argument shapes:
+accept only the forms you have validated rather than trying to enumerate every
+dangerous form.
+
+Defence in depth means these layers compose. Input validation reduces the
+surface area the policy is exposed to. Output validation constrains what it
+can trigger. Neither layer trusts the other to catch everything, and neither
+trusts the policy itself to stay within bounds.
+
+> **Best practice:** the model is untrusted; everything it consumes and
+> everything it emits passes a validation boundary you own.
+
+Guardrails are deterministic code wrapping a non-deterministic core. The policy
+can surprise you; the guardrails should not. Keep them simple, keep them fast,
+log every rejection, and place them at every seam — not just the user-facing
+edge but anywhere data crosses a trust boundary inside the loop.
+
+Next: **A Guardrail Layer**

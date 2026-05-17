@@ -232,10 +232,11 @@ mechanics that stay true across SDKs and model versions. The full map:
 ## How the hands-on works
 
 Interactive lessons run **real Python in your browser** — no install, no
-keys, no cost. So you can learn mechanics without a live model, each
-agent's policy is a **deterministic mock LLM** you control. Calling real
-model APIs and frameworks is a production concern covered later; the
-*patterns* you learn here are identical either way.
+keys, no cost — so you can focus on mechanics. Each agent's policy is a
+**deterministic mock LLM** you control: the same interface as a real
+model, fully reproducible. Calling real model APIs and frameworks is a
+production concern covered later; the *patterns* you learn here are
+identical either way.
 
 ## What an agent is
 
@@ -381,6 +382,10 @@ mock gives the same interface with none of the nondeterminism. Every later
 module reuses exactly this seam; only the implementation behind it changes
 when real models arrive.
 
+This is the same `policy(observation) -> action` seam from the previous
+lesson, just named for the LLM's perspective: the `observation` is the
+prompt you hand the model, and the `action` is the response it returns.
+
 <PyRunner client:visible code={`class MockLLM:
     def __init__(self, table):
         self.table = table
@@ -400,6 +405,10 @@ def agent_step(prompt, llm):
 for p in ["weather in nyc?", "say hi", "unknown request"]:
     agent_step(p, policy)
 `} />
+
+Here we call the policy one step at a time (`agent_step`) instead of the
+full `agent_loop` from the previous lesson — the loop is unchanged, we're
+just isolating the policy call to see the mock respond.
 
 The agent code never changes when you go from this mock to a real model —
 it still just calls `policy(prompt)`. That is the entire point of the seam.
@@ -483,6 +492,11 @@ test.describe("curriculum", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "The Agent Loop" }),
     ).toBeVisible();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Curriculum" })
+        .locator('a[aria-current="page"]'),
+    ).toHaveAttribute("href", "/learn/02-the-agent-loop");
   });
 
   test("mark complete persists across reload", async ({ page }) => {

@@ -1,0 +1,28 @@
+---
+title: "Coordination Failure Modes"
+moduleId: "multi-agent"
+order: 3
+type: "reading"
+summary: "Deadlock, lost messages, and cost explosions in agent teams."
+estMinutes: 8
+---
+
+**Objective:** the failure modes unique to multi-agent systems and their mitigations.
+
+Adding agents adds coordination surface, and coordination surface fails in ways a single agent does not. Understanding these failure modes before they appear in production is the difference between a stable system and one you are debugging at 2 a.m.
+
+**Handoff loops and deadlock.** A supervisor routes to Worker A, which routes back to the supervisor, which routes to Worker A again. In a model-driven system this can happen whenever the routing instruction is ambiguous and the worker's output doesn't clearly signal completion. The mitigation is a step budget: the supervisor tracks total steps taken across the whole team and halts when the budget is exhausted. A depth budget complements this — no handoff chain may exceed N hops before the task is considered failed and a fallback result is returned. Both limits must be enforced by code, not by trusting the models to stop on their own.
+
+**Lost messages and silent failures.** A worker returns an empty string, an error object the supervisor wasn't designed to parse, or a result in the wrong format. Without explicit schema validation on every handoff, these silent failures propagate: the supervisor incorporates a blank result, the next worker builds on it, and the final output is confidently wrong. Validate the shape of every worker response before passing it forward. Reject and retry — up to a small retry cap — before surfacing the failure to the caller.
+
+**Cost multiplies per agent.** In a single-agent loop, a task costs one model call per step. In a two-worker system with a supervisor, the same task costs at least three model calls before any retries. Add reflection or multi-step workers and the multiplier grows fast. Budget total steps across the whole team, not per agent, and measure actual cost on representative tasks before committing to a multi-agent design.
+
+**Debugging is harder.** A single-agent trace is one sequence of observations and actions. A multi-agent trace is a tree: the supervisor's call spawns worker calls, which may spawn further calls. Reproducing a failure requires replaying the entire tree, not just one path. The practical response is to trace every handoff — log the input context, the routing decision, and the worker output at each node. This is not optional instrumentation; it is the only way to know which node in the tree caused the failure (forward-point to Observability & Debugging module).
+
+**A flat tool often beats a worker.** If the "worker" would be a single model call with one specialised instruction, consider wrapping that call as a tool instead. The supervisor calls the tool directly; there is no separate agent identity, no handoff protocol, and no additional routing logic. You lose independent deployability but gain simplicity. Use workers when the subtask itself needs its own agent loop — multiple steps, its own tool set, its own memory. Use tools when it is a single call with a well-defined schema.
+
+> **Best practice:** budget total steps across the whole team, not per agent — multi-agent cost compounds, and an unbounded team will exceed your latency and spend limits faster than any single agent would.
+
+Multi-agent systems are not inherently more capable than a well-equipped single agent; they are more capable at specific coordination patterns. The failure modes above are the price of those patterns. Know the price before you pay it.
+
+Next: **Multi-Agent Systems Check**

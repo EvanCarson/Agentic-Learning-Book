@@ -1,0 +1,67 @@
+---
+title: "How to Measure an Agent"
+moduleId: "evaluation"
+order: 1
+type: "reading"
+summary: "Task success vs trajectory: what to measure and why."
+estMinutes: 8
+---
+
+**Objective:** define task-success metrics vs trajectory/process metrics and why agents need both.
+
+## Two things to measure
+
+An agent produces two things worth measuring: a **final outcome** and the
+**path it took to get there**. Most teams start with the outcome — did the
+agent return the right answer, take the correct action, produce the expected
+file? This is the *task-success* metric and it is the easiest to automate:
+compare the agent's output to a known-correct label.
+
+Task-success metrics are necessary but not sufficient. An agent can produce
+the right answer by accident, or reach a wrong answer through a sequence of
+steps that would normally succeed. *Trajectory checks* inspect the path:
+which tools were called, in which order, with which arguments. If a
+research agent should always retrieve evidence before stating a conclusion,
+you can assert that the retrieval tool was called before the summarise tool —
+regardless of whether the final text looks correct.
+
+## Golden test sets and regression suites
+
+A **golden set** is a curated collection of (input, expected-output) pairs
+that covers the behaviours you care about. Run the agent against the golden
+set, compute a pass rate, and track it over time. When a production failure
+surfaces a new bug, add a case to the set — turn every incident into a test.
+
+A **regression suite** is that golden set running in CI. Every pull request
+must not drop the pass rate below a threshold. This is the minimum
+infrastructure an agent team needs before shipping: without it, refactors
+and prompt edits silently break behaviour and you discover failures in
+production rather than in review.
+
+## LLM-as-judge
+
+For outputs that cannot be compared with string equality — long-form prose,
+reasoning traces, code that could be correct in many forms — teams often use
+a second model to evaluate the first. The judge model is given the input,
+the agent's output, and a rubric, and returns a score or a pass/fail
+decision (real integration: subsystem D).
+
+LLM judges are powerful but introduce their own biases. They tend to favour
+verbose, confident-sounding outputs; they can be sensitive to the order in
+which options are presented; and their verdicts vary across runs unless
+temperature and seed are fixed. Use LLM judges for nuanced dimensions that resist
+exact matching, but calibrate them against human ratings and monitor
+judge-model drift when you upgrade the underlying model.
+
+## Offline evaluation before shipping
+
+Run evaluation **offline** — against a fixed dataset, before deployment —
+to separate the measurement signal from production traffic. Offline eval is
+fast, cheap, repeatable, and safe. Production monitoring is a complement,
+not a replacement: it catches distribution shift but cannot control for
+confounders the way an offline eval can.
+
+> **Best practice:** an agent without a regression suite is unshippable —
+> pin behaviour with cases, not vibes.
+
+Next: **An Eval Harness**

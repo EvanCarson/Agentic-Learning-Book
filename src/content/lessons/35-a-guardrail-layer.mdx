@@ -1,0 +1,39 @@
+---
+title: "A Guardrail Layer"
+moduleId: "guardrails"
+order: 2
+type: "interactive"
+summary: "Block disallowed tools and unsafe arguments before execution."
+estMinutes: 11
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** put a deterministic check between the policy's chosen
+action and execution: allow only allow-listed tools, and reject unsafe
+arguments.
+
+<PyRunner client:visible code={`ALLOWED = {"search", "calc"}
+
+def guard(action):
+    name, _, arg = action.partition(":")
+    name = name.strip()
+    arg = arg.strip()
+    if name not in ALLOWED:
+        return ("blocked", "tool_not_allowed")
+    if ".." in arg or "/" in arg:
+        return ("blocked", "unsafe_arg")
+    return ("ok", name + "(" + arg + ")")
+
+for a in ["search: cats", "delete: db", "calc: 2+2", "search: ../etc"]:
+    print(a, "=>", guard(a))
+`} />
+
+The policy — your Foundations `MockLLM` seam — may *propose* anything;
+this deterministic guard decides what actually runs. A blocked action
+returns a defined result the loop can handle; it never throws. The path check here illustrates the principle; production argument validation uses a schema or a dedicated library, not ad hoc substring scanning.
+
+> **Best practice:** allow-list, don't deny-list; validate arguments
+> structurally; a blocked action is a normal, logged outcome.
+
+Next: **Prompt Injection & Safe Tools**

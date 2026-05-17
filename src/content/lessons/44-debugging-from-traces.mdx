@@ -1,0 +1,71 @@
+---
+title: "Debugging From Traces"
+moduleId: "observability"
+order: 3
+type: "reading"
+summary: "From a failed trajectory to a root cause and a regression case."
+estMinutes: 7
+---
+
+**Objective:** describe the workflow from a captured failure to a fix that stays fixed.
+
+A production failure lands in your queue. Without traces, you re-run the
+agent with the same input and hope it reproduces — often it won't. With a
+stored trajectory, you skip the guessing entirely: open the trace, read the
+steps in order, and the failure is already there, frozen in time.
+
+## Reproduce from the trace
+
+Load the stored trajectory and replay it. Feed each recorded observation
+back through the current policy and compare actions. If the failure
+reproduces under replay you have a deterministic test case. If it doesn't
+reproduce, the policy changed since the failure — check recent deploys and
+compare model version or instruction changes between the stored run and the
+current one.
+
+## Localise the bad step
+
+Walk the trajectory looking for the first step where the action diverges
+from what a correct run would have produced. The fault usually falls into
+one of three layers:
+
+- **Perception.** The observation itself was wrong — bad retrieval, a
+  malformed tool result, truncated context. Fix the tool or the retrieval
+  query.
+- **Policy.** The observation was correct but the decision was wrong —
+  the model misread the instruction, a parsing rule misfired, a pattern
+  matched the wrong case. Fix the instruction or the parser.
+- **Tool execution.** The decision was correct but the action had a bad
+  side-effect — a tool returned an error or silently returned stale data.
+  Fix the tool or add a result validator.
+
+Knowing which layer is at fault before touching code prevents the common
+trap of patching the wrong place and reintroducing the bug under different
+conditions.
+
+## Turn the failure into a regression case
+
+Once you have isolated the bad step, extract the (observation, expected
+action) pair and add it to your evaluation suite. This follows the same approach as the Evaluation & Testing module: extract a golden-set case from the failure and add a trajectory check that asserts the correct action at the correct step. The test is cheap to run, fast to
+interpret, and permanently prevents the exact failure from silently
+re-emerging after a future change.
+
+A mature codebase accumulates these regression cases over time. Each
+production failure that was traced, localised, and fixed becomes a
+permanent specification for the correct behaviour in that situation.
+
+## Dashboards and alerts on trace metrics
+
+Structured events aggregate into operational signals: step error rate,
+mean trajectory length, tool latency by type, fraction of runs that hit
+the step budget. Thresholds on these metrics trigger alerts before users
+notice — a tool whose error rate rises from one percent to ten percent is
+a regression even if no individual run fails visibly (real integration:
+subsystem D). Real observability platforms ingest the same event stream and
+provide cross-run search, anomaly highlighting, and automatic grouping of
+similar failures (real integration: subsystem D).
+
+> **Best practice:** every production failure becomes a replayed trace and
+> a new regression case before it is closed.
+
+Next: **Observability & Debugging Check**

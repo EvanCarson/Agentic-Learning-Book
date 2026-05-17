@@ -1,0 +1,66 @@
+---
+title: "Timeouts, Retries & Fallback"
+moduleId: "reliability"
+order: 3
+type: "reading"
+summary: "Bounded retries, timeouts, and graceful degradation."
+estMinutes: 8
+---
+
+**Objective:** explain reliability patterns for unreliable model and tool calls.
+
+A deployed agent calls external services: a model endpoint, a search API, a
+database, a third-party tool. Any of those calls can be slow, transiently
+unavailable, or silently wrong. Without explicit reliability handling, one
+hung call stalls the entire run. The patterns below apply to any external
+call, model or otherwise.
+
+## Timeouts on every external call
+
+Every network call carries a timeout. Without one, a stalled remote end holds
+resources indefinitely and no upstream budget can fire. Setting an explicit
+timeout converts "wait forever" into a defined error your loop can handle.
+
+Timeout values should reflect expected latency at the p95–p99 level, not the
+median. A value too tight causes spurious failures; too loose defeats the
+purpose. Real network call configuration wires through the provider client or
+an HTTP library (real integration: subsystem D).
+
+## Bounded retries with backoff
+
+A timed-out or rate-limited call is worth retrying. Fix a maximum retry count
+before the first attempt, not after a failure spiral. Three retries is a
+common ceiling; more than five amplifies load on an already-stressed service.
+
+Space retries with increasing delay — exponential backoff — to reduce the
+chance of hammering a recovering service. A small random offset (jitter)
+prevents concurrent agents from retrying in lockstep (real integration:
+subsystem D).
+
+## Idempotency makes retries safe
+
+Retrying is only safe when repeating the call produces no additional side
+effect. Reads are typically idempotent. Writes and actions require deliberate
+design: assign a unique identifier to each action and have the receiver
+de-duplicate. Without idempotency, a timeout that triggers a retry can
+execute an action twice.
+
+## Fallback model or answer
+
+When retries are exhausted the loop needs a defined next step: switch to a
+smaller model; return a cached answer; return a partial result; return a safe
+default. Any of these is better than an unhandled exception.
+
+> **Best practice:** every external call has a timeout, a retry cap, and a
+> fallback — no unbounded waits, ever.
+
+## Circuit breaking
+
+If failures are persistent — a service is down, not just slow — continuing to
+attempt calls wastes budget. A circuit breaker tracks the recent failure rate
+and stops calling once it crosses a threshold, letting the service recover.
+Composed with the budget and cache from the previous lesson, these patterns
+form a loop that spends deliberately, handles failure gracefully, and stops
+before spiralling.
+
+Next: **Cost, Latency & Reliability Check**

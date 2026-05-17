@@ -1,0 +1,28 @@
+---
+title: "Reflection & Its Limits"
+moduleId: "planning"
+order: 3
+type: "reading"
+summary: "Self-critique loops, when they help, and when they spin."
+estMinutes: 8
+---
+
+**Objective:** explain reflection (critique→revise→retry) patterns and their failure modes.
+
+Once a plan has been executed you have a result. The result may be technically correct but still miss the goal — a report that answers all sub-questions but never synthesizes them into a recommendation, or a migration script that runs without errors but leaves deprecated patterns in place. Reflection is the mechanism for catching this gap: after generating a result, route it back to a model with the instruction to critique it against the original goal, then use that critique to revise either the plan or the output.
+
+**The reflect loop.** In its simplest form: generate → critique → revise → check again. The critique step produces a structured evaluation — what is wrong, how bad, and what specifically should change. The revise step applies those changes. The loop continues until the critique finds no significant issues or a budget limit is hit. The critique model can be the same model as the generator or a separate one with a different instruction set.
+
+**Bounded reflection.** The most important design decision in a reflection loop is the iteration cap. Without a hard limit, a model that repeatedly fails to satisfy its own critic will burn tokens indefinitely. Set a maximum number of passes before the loop exits with the best result so far. In practice, two to three reflection passes capture most of the gain; passes beyond that rarely move the quality metric in a meaningful way.
+
+**When reflection fails.** Reflection can actively degrade output quality in two ways. First, the critic and generator may share the same blind spot: if a model's instruction leads it to systematically misinterpret a constraint, a critic built from the same model with a similar instruction will often miss the same constraint. Self-critique does not recover from systematic errors in the underlying model's interpretation of the task — only changing the instruction or the model does. Second, repeated revision can cause the output to drift away from the original goal as the model optimizes for satisfying the critic rather than the user's actual intent.
+
+**Cost multiplies per iteration.** Each reflection pass adds at least two model calls — the critique and the revision — on top of the original generation. Three passes mean seven or more calls for a task that started as one. This cost is proportional to the length of the output being evaluated, not just the number of passes. Long outputs with multiple reflection iterations will dominate your latency budget quickly.
+
+**Measuring whether reflection helps.** The only reliable test is empirical: run a set of representative tasks with and without the reflection layer, score the outputs against a ground truth or rubric, and check whether the reflection group scores significantly higher. If it does not, the loop is pure overhead. This measurement should precede shipping a reflection layer to production, and you should repeat it whenever the underlying model or instruction changes (forward-point to Evaluation & Testing module).
+
+> **Best practice:** cap reflection iterations and prove it improves outcomes — unbounded self-critique burns budget for diminishing returns.
+
+Reflection is a powerful corrective mechanism when the failure mode is output quality that is close but not quite right, and when that quality gap can be detected by a critic. It is the wrong tool when failures are systematic, when the task is already well-solved in one pass, or when latency is tightly constrained.
+
+Next: **Planning & Reasoning Check**

@@ -1,0 +1,50 @@
+---
+title: "A Supervisor & Workers"
+moduleId: "multi-agent"
+order: 2
+type: "interactive"
+summary: "Route subtasks from a supervisor to specialised worker agents."
+estMinutes: 12
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** a supervisor routes each task to the worker whose role
+matches, then the workers' outputs are collected.
+
+<PyRunner client:visible code={`def math_worker(task):
+    return "math:" + task
+
+def text_worker(task):
+    return "text:" + task
+
+WORKERS = {"math": math_worker, "text": text_worker}
+
+class Supervisor:
+    def __init__(self, routes):
+        self.routes = routes
+
+    def route(self, task):
+        return self.routes.get(task, "text")
+
+sup = Supervisor({"2+2": "math", "summarise": "text"})
+
+def run(tasks):
+    out = []
+    for t in tasks:
+        role = sup.route(t)
+        out.append(WORKERS[role](t))
+    print(out)
+
+run(["2+2", "summarise", "unknown"])
+`} />
+
+The `Supervisor` is the Foundations `MockLLM` seam as a router: a
+deterministic `task -> role`. It only decides *who* handles a task; the
+workers do the work. Unknown tasks default to the text worker (a safe
+generalist).
+
+> **Best practice:** give the supervisor one job — routing — and keep
+> workers independently testable. Coordination logic and work must not mix.
+
+Next: **Coordination Failure Modes**

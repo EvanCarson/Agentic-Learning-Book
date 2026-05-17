@@ -1,0 +1,59 @@
+---
+title: "A Tool-Using Loop"
+moduleId: "tools"
+order: 2
+type: "interactive"
+summary: "Build a ReAct-style loop: the policy picks a tool, the runtime runs it."
+estMinutes: 12
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** wire a tool registry into the loop — the policy chooses a
+tool name and the runtime executes the registered function from a registry
+you control.
+
+<PyRunner client:visible code={`def get_weather(city):
+    return "sunny in " + city
+
+def add(args):
+    a, b = args.split(",")
+    return str(int(a) + int(b))
+
+TOOLS = {"get_weather": get_weather, "add": add}
+
+class MockLLM:
+    def __init__(self, table):
+        self.table = table
+
+    def __call__(self, prompt):
+        return self.table.get(prompt, "answer: i_dont_know")
+
+def run(prompt, llm):
+    decision = llm(prompt)
+    name, _, arg = decision.partition(":")
+    name = name.strip()
+    if name in TOOLS:
+        result = TOOLS[name](arg.strip())
+        print(prompt, "-> tool", name, "->", result)
+    else:
+        print(prompt, "-> answer ->", arg.strip())
+
+llm = MockLLM({
+    "weather in paris": "get_weather: paris",
+    "two plus three": "add: 2,3",
+    "hello": "answer: hi",
+})
+
+for p in ["weather in paris", "two plus three", "hello"]:
+    run(p, llm)
+`} />
+
+This `MockLLM` is the same seam from Foundations — the loop never trusts
+the model to *run* anything; it maps a chosen **name** to a vetted
+function in `TOOLS`. Unknown names fall back to a plain answer. Note that each tool unpacks its own arguments (`add` splits the comma-packed string) — argument parsing is the tool's job, not the dispatcher's.
+
+> **Best practice:** the model selects a tool by name from a registry you
+> control; argument parsing and execution are your code, not the model's.
+
+Next: **Tool Errors & Retries**
