@@ -1,0 +1,55 @@
+---
+title: "An Eval Harness"
+moduleId: "evaluation"
+order: 2
+type: "interactive"
+summary: "Score an agent against a golden set and compute the pass rate."
+estMinutes: 12
+---
+
+import PyRunner from "../../components/PyRunner.tsx";
+
+**Objective:** run an agent over a labelled set of cases and compute a
+pass rate — the smallest useful evaluation.
+
+<PyRunner client:visible code={`class MockLLM:
+    def __init__(self, table):
+        self.table = table
+
+    def __call__(self, prompt):
+        return self.table.get(prompt, "unknown")
+
+agent = MockLLM({
+    "2+2": "4",
+    "capital of france": "paris",
+    "color of sky": "green",
+})
+
+GOLDEN = [
+    ("2+2", "4"),
+    ("capital of france", "paris"),
+    ("color of sky", "blue"),
+]
+
+def evaluate(model, cases):
+    passed = 0
+    for prompt, expected in cases:
+        got = model(prompt)
+        ok = got == expected
+        if ok:
+            passed = passed + 1
+        print(prompt, "expected", expected, "got", got, "->", ok)
+    print("pass rate =", passed, "/", len(cases))
+
+evaluate(agent, GOLDEN)
+`} />
+
+`MockLLM` is the same Foundations seam; here it's the *system under test*.
+The harness is just: run every case, compare to the label, aggregate.
+Everything sophisticated (judges, trajectory checks) is a richer
+comparator wrapped around this same loop.
+
+> **Best practice:** start every agent with a tiny golden set and a pass
+> rate in CI; grow the set from every production failure.
+
+Next: **Evaluation Pitfalls**

@@ -49,4 +49,10 @@ export const modules: Module[] = [
     order: 7,
     summary: "Coordinating specialised agents: supervisor and workers.",
   },
+  {
+    id: "evaluation",
+    title: "Evaluation & Testing",
+    order: 8,
+    summary: "Measuring agents: task success and trajectory checks.",
+  },
 ];
