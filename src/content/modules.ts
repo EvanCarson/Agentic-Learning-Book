@@ -43,4 +43,10 @@ export const modules: Module[] = [
     order: 6,
     summary: "Decomposition, plan-execute, and reflection loops.",
   },
+  {
+    id: "multi-agent",
+    title: "Multi-Agent Systems",
+    order: 7,
+    summary: "Coordinating specialised agents: supervisor and workers.",
+  },
 ];
