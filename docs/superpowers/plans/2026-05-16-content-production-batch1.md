@@ -406,6 +406,10 @@ for p in ["weather in nyc?", "say hi", "unknown request"]:
     agent_step(p, policy)
 `} />
 
+Here we call the policy one step at a time (`agent_step`) instead of the
+full `agent_loop` from the previous lesson — the loop is unchanged, we're
+just isolating the policy call to see the mock respond.
+
 The agent code never changes when you go from this mock to a real model —
 it still just calls `policy(prompt)`. That is the entire point of the seam.
 

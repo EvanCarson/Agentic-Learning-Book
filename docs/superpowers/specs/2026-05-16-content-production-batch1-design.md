@@ -89,11 +89,11 @@ Lessons (replace the 4 skeleton files in `src/content/lessons/`):
   dependence) so output is stable for the e2e assertion; authored at the
   indentation the MDX editor renders (the documented 2-space-normalization
   known limitation — write Python so it stays valid post-normalization).
-- Every lesson: explicit learning objective up top, ≈6–12 min
+- Every reading/interactive lesson: explicit learning objective up top, ≈6–12 min
   (`estMinutes`), a concrete best-practice callout, a forward link.
 - Frontmatter exactly per B's `lessons` schema: `title`, `moduleId`
   (`"foundations"`), `order` (1-based, unique in module), `type`
-  (`reading`|`interactive`|`quiz`), `summary`, `estMinutes`.
+  (`reading`|`interactive`|`quiz`), `summary`, `estMinutes`. (Quiz lessons are stubs: `LessonLayout` suppresses their body for `QuizStub`, so the objective/callout/forward-link conventions and the ≈6–12 min range do not apply to them.)
 
 ## Required test maintenance (in-scope)
 
