@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on validation boundaries and safe tools."
 estMinutes: 4
+questions:
+  - prompt: "Why does lesson 34 recommend allow-listing tools rather than deny-listing them?"
+    options:
+      - "Deny-listing is equally robust - you just enumerate every dangerous form"
+      - "Anything not explicitly permitted is blocked, so a new tool cannot accidentally become available without an explicit decision"
+      - "The policy should self-restrict to only safe tools, making a list unnecessary"
+      - "Output validation alone is sufficient if the policy is well-prompted"
+    answerIndex: 1
+    explanation: "Allow-listing means anything not on the list is blocked by default, so adding a new tool always requires an explicit decision. Lesson 34 states that trying to enumerate every dangerous form is exactly what deny-listing forces you to do -- and why it is weaker."
+  - prompt: "According to lesson 34, where in the pipeline does input validation belong?"
+    options:
+      - "Before the policy sees the data, normalising all inputs at the boundary"
+      - "After the policy runs, so the guardrail sees the model's full context"
+      - "Only on user messages -- retrieved content from a document store is trusted"
+      - "Inside the policy function itself, which is best placed to detect anomalies"
+    answerIndex: 0
+    explanation: "Lesson 34 says to normalise inputs before handing anything to the policy -- check lengths, strip control characters, enforce schema contracts on tool returns. It explicitly states that retrieved and tool-fetched data is equally untrusted as user content."
+  - prompt: "In the guardrail layer built in lesson 35, what happens when an action is blocked?"
+    options:
+      - "The guardrail raises an exception to halt the agent loop immediately"
+      - "The tool runs in a sandbox and its output is silently discarded"
+      - "The policy is re-prompted with a stronger system message and retries"
+      - "A defined result such as ('blocked', reason) is returned; the loop handles it without an exception"
+    answerIndex: 3
+    explanation: "Lesson 35 shows the guard returning a ('blocked', reason) tuple to the loop and states explicitly that a blocked action 'never throws'. The loop receives a defined result and can retry, escalate, or stop gracefully -- no exception is raised."
+  - prompt: "Lesson 36 identifies three main prompt-injection vectors. Which set is correct?"
+    options:
+      - "System prompt, model weights, and output tokens"
+      - "Only user messages -- tool results are structured objects and therefore safe"
+      - "Retrieved content, tool return values, and direct user input"
+      - "Environment variables, API keys, and log files"
+    answerIndex: 2
+    explanation: "Lesson 36 lists the three main vectors as retrieved content, tool return values, and direct user input. It explicitly notes that a calendar API result or web-scraped chunk can embed injected instructions -- structured format does not make tool results safe."
+  - prompt: "For high-impact actions such as deleting data or spending money, what does lesson 36 require?"
+    options:
+      - "Authorisation outside the model -- a human-in-the-loop step or a cryptographic approval token -- so the model alone cannot trigger the action"
+      - "The policy should self-audit by reviewing its previous output before acting"
+      - "Provide the model with a read-only copy of the tool to inspect before deciding"
+      - "Use a deny-list of high-impact tool names in the guardrail layer"
+    answerIndex: 0
+    explanation: "Lesson 36 states that high-impact actions require authorisation outside the model -- a human confirmation step or a cryptographic approval token -- so that even a successfully injected policy cannot trigger the action alone. A deny-list approach is the weaker pattern that lessons 34 and 35 argue against in favour of allow-listing."
 ---
 
-A knowledge check for the Guardrails & Safety module. The interactive
-quiz engine is coming soon; review the input/output validation boundary,
-the guardrail you built, and prompt injection with least-privilege tools,
-then mark this complete when you are confident.
+A knowledge check for the Guardrails & Safety module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.
