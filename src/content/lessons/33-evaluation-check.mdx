@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on metrics, the eval harness, and pitfalls."
 estMinutes: 4
+questions:
+  - prompt: "Why are task-success metrics alone not sufficient for agentic systems?"
+    options:
+      - "They require an LLM judge and are therefore too expensive"
+      - "They only work when temperature is pinned to zero"
+      - "They cannot be compared with string equality and must use regex"
+      - "An agent can produce the right answer by accident or via a flawed path that will fail later"
+    answerIndex: 3
+    explanation: "Lesson 30 notes that an agent can reach a correct answer through a sequence of steps that would normally fail - a lucky coincidence. Trajectory checks catch the path failures that output checks miss. The cost/expense concern is raised for LLM judges, not for task-success checks; temperature pinning is a fix for flaky evals, not a prerequisite for task-success metrics."
+  - prompt: "What is eval overfitting, and what is the prescribed fix?"
+    options:
+      - "Tuning the agent's instructions against the same cases you measure on; fix by holding out cases the prompt author never sees"
+      - "Running too many eval cases so the suite is slow; fix by trimming the golden set to only edge cases"
+      - "Using an LLM judge whose temperature is not pinned; fix by routing evaluation through a deterministic mock"
+      - "Letting the golden set grow stale relative to production traffic; fix by adding production failures to the set"
+    answerIndex: 0
+    explanation: "Lesson 32 defines eval overfitting as tuning against the same cases you measure on so the pass rate climbs without the agent genuinely improving. The fix is strict separation: ideally a separate person authors the held-out set. Options C and D each describe real pitfalls - non-deterministic evals and eval-set drift - but those are distinct problems with distinct fixes described elsewhere in lesson 32."
+  - prompt: "In the eval harness built in lesson 31, what is the core loop structure?"
+    options:
+      - "Compare agent outputs pairwise and keep the better result each round"
+      - "Ask a judge model to rate each case on a rubric, then average the scores"
+      - "Run every case, compare each result to its label, aggregate into a pass rate"
+      - "Retrieve the top-k documents and check whether the expected answer appears"
+    answerIndex: 2
+    explanation: "Lesson 31 builds the harness as: iterate over every (prompt, expected) pair, compare the agent output to the label, count passes, then print the pass rate. The pairwise approach and judge-model rubric are not the harness structure built there. Retrieval recall@k is mentioned as a variant comparator within the same loop, not the loop itself."
+  - prompt: "According to lesson 32, what is the correct way to handle non-deterministic agent outputs in evaluation?"
+    options:
+      - "Accept some flakiness because real agents must be tested against real model outputs"
+      - "Route evaluation through a deterministic mock, or pin temperature and seed when the real model must be used"
+      - "Run the golden set only once per release to avoid seeing variance"
+      - "Switch to an LLM judge, which averages out variance across multiple verdicts"
+    answerIndex: 1
+    explanation: "Lesson 32 states the fix for flaky, non-deterministic evals is routing evaluation through a deterministic mock or pinning temperature and seed; if neither is possible, run each case multiple times and document the variance budget. Accepting flakiness is explicitly warned against - flaky tests erode trust and train developers to ignore failures. Running once per release is not mentioned and would just hide the variance."
+  - prompt: "What is eval-set drift, and why does a stable golden-set pass rate not protect against it?"
+    options:
+      - "The golden set no longer reflects the distribution of real production inputs because production traffic shifts after launch; pass rate on the original set stays high while production error rate rises"
+      - "The eval set grows so large that CI takes too long to run it; pass rate appears stable but test coverage thins out"
+      - "The agent prompt is updated but the golden set labels are not; the comparator returns stale matches"
+      - "LLM-judge verdicts shift when the underlying judge model is upgraded; stable scores hide model drift"
+    answerIndex: 0
+    explanation: "Lesson 32 defines eval-set drift as the gap between the golden set's original distribution and shifted production traffic - new query patterns, phrasing, and edge cases. An agent whose golden-set pass rate is stable but whose production error rate is rising is the exact scenario described. Options C and D each point to real pitfalls covered in the lessons - stale labels and judge-model drift - but neither is the definition of eval-set drift."
 ---
 
-A knowledge check for the Evaluation & Testing module. The interactive
-quiz engine is coming soon; review task-success versus trajectory
-metrics, the eval harness you built, and the evaluation pitfalls, then
-mark this complete when you are confident.
+A knowledge check for the Evaluation & Testing module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.
