@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on tools, registries, and failure handling."
 estMinutes: 4
+questions:
+  - prompt: "Which four parts make up the tool contract described in 'What Is a Tool?'"
+    options:
+      - "Name, prompt, cache, and log"
+      - "Model, runtime, registry, and fallback"
+      - "Name, description, typed arguments, and deterministic implementation"
+      - "Schema, parser, executor, and monitor"
+    answerIndex: 2
+    explanation: "The lesson defines the tool contract as name (for selection), description (for understanding when to use it), typed arguments (validated before execution), and deterministic implementation. The other options mix in concepts not part of the contract."
+  - prompt: "What prevents the model from executing arbitrary code in a tool-using agent?"
+    options:
+      - "The model selects a name from a registry you control; your runtime maps that name to a registered function and calls it"
+      - "The model is sandboxed inside the tool schema so it cannot reach outside the schema boundary"
+      - "The loop rejects any tool call whose name contains special characters"
+      - "Argument validation blocks all code the model attempts to run directly"
+    answerIndex: 0
+    explanation: "The model only selects a name and proposes an argument; your registry executes the matching function. The model never runs code itself. Schema validation is a separate concern that does not address execution authority."
+  - prompt: "In the tool-using loop from 'A Tool-Using Loop', what happens after the runtime executes a tool?"
+    options:
+      - "The loop halts and returns the tool result to the caller immediately"
+      - "The loop discards the result and calls the policy again with the original prompt"
+      - "The loop logs the result and waits for the next user message"
+      - "The tool result becomes the next observation and is fed back to the policy"
+    answerIndex: 3
+    explanation: "The loop feeds the tool result back to the policy as the next observation, continuing the perceive-decide-act cycle. Halting immediately or discarding the result would break the loop's ability to reason over tool output."
+  - prompt: "According to 'Tool Errors & Retries', how should a tool failure be treated in the agent loop?"
+    options:
+      - "It should raise an unhandled exception so the caller can decide how to respond"
+      - "It is a structured observation returned to the policy, which can then retry or degrade gracefully"
+      - "It should be silently swallowed so the loop continues without interruption"
+      - "It terminates the loop and returns an empty result to the caller"
+    answerIndex: 1
+    explanation: "The lesson frames failure as data: a try/except around the tool call is the contract, not defensive programming. The structured error is fed back to the policy like any successful result. Silent swallowing and unhandled exceptions both violate this contract."
+  - prompt: "Why does the retry policy require an attempt budget rather than retrying until success?"
+    options:
+      - "Retrying more than once makes the agent non-deterministic and unusable"
+      - "An attempt budget is optional; the model stops retrying once it finds the right arguments"
+      - "A bounded attempt budget prevents runaway cost when a tool is broken or a resource does not exist"
+      - "The budget limits the number of distinct tools the agent may call in a single run"
+    answerIndex: 2
+    explanation: "The lesson warns that unbounded retry loops are a leading source of runaway agent cost: the model may confidently retry a call that will never succeed. A small integer budget (two to four attempts) caps this. The budget governs retry count, not tool variety."
 ---
 
-A knowledge check for the Tool Use module. The interactive quiz engine is
-coming soon; review the tool contract, the registry-not-eval rule, and
-treating failure as an observation with a retry budget, then mark this
-complete when you are confident.
+A knowledge check for the Tool Use module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.
