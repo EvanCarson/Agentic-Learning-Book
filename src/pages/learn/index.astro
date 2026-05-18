@@ -11,6 +11,7 @@ const lessons: LessonMeta[] = entries.map(toLessonMeta);
 const curriculum = buildCurriculum(modules, lessons);
 ---
 <BaseLayout title="Curriculum">
-  <h1 class="mb-6 text-4xl font-bold">Agentic AI Curriculum</h1>
+  <h1 class="mb-2 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">Agentic AI Curriculum</h1>
+  <p class="mb-8 text-slate-600 dark:text-slate-400">A linear, job-ready path — modules of short lessons, interactive code, and checks.</p>
   <Syllabus curriculum={curriculum} />
 </BaseLayout>
