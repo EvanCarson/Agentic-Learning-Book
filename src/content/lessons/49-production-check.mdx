@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on stateless handlers and the durable principles."
 estMinutes: 4
+questions:
+  - prompt: "Why does a production agent handler reconstruct its state on every request rather than keeping it in process memory?"
+    options:
+      - "Processes restart between requests, so in-process memory is lost; the handler must be stateless"
+      - "In-process memory is too slow for production workloads"
+      - "The mock LLM seam cannot share state across requests"
+      - "Environment variable loading clears process memory on each call"
+    answerIndex: 0
+    explanation: "Shipping an Agent states that production processes restart between requests, so no per-user or per-run state survives between calls. In-process memory speed and the mock seam are not the reason; env vars do not clear memory."
+  - prompt: "In the production handler built in 'A Production-Shaped Handler', what does handle() return when the budget is exhausted?"
+    options:
+      - "The raw model text from the policy"
+      - "A structured result with status 'rejected' and reason 'no_budget'"
+      - "An exception raised to the caller"
+      - "An empty string so the caller decides what to do"
+    answerIndex: 1
+    explanation: "The handler code in A Production-Shaped Handler returns {\"status\": \"rejected\", \"reason\": \"no_budget\"} when budget <= 0. The best-practice note explicitly says to return structured results, never raw model text."
+  - prompt: "When you swap the mock policy for a real model in production, what must change inside the handle() function?"
+    options:
+      - "The budget check must be removed because real models manage their own limits"
+      - "The guardrail logic must be rewritten to match the real model's output format"
+      - "Nothing - handle() stays identical; only the implementation behind the seam changes"
+      - "The trace list must be disabled to avoid leaking real model responses"
+    answerIndex: 2
+    explanation: "Both Shipping an Agent and A Production-Shaped Handler state that swapping mock for real model changes nothing in the handler - production changes the implementation behind the seam, not the loop or handle(). The other options describe misconceptions the lessons directly contradict."
+  - prompt: "According to 'Going Further', what happens to your evals and guardrails when you migrate to a new framework or SDK version?"
+    options:
+      - "They must be rewritten because frameworks define the eval and guardrail interfaces"
+      - "They are automatically upgraded by the framework migration tool"
+      - "They are unaffected - evals and guardrails live outside the implementation and survive SDK churn"
+      - "They become redundant because modern frameworks include built-in evaluation"
+    answerIndex: 2
+    explanation: "Going Further states that evals and guardrails live outside the implementation - you can migrate without touching them. The lesson explicitly says frameworks change; the loop, the seam, evals, and guardrails do not."
+  - prompt: "Which statement best reflects 'Going Further's description of observability as an architecture?"
+    options:
+      - "Observability means adding a monitoring dashboard after the agent is deployed"
+      - "Observability is one event per step from day one, not a dashboard bolted on later"
+      - "Observability requires a third-party tracing service wired into the policy seam"
+      - "Observability is optional polish that can be added once the agent reaches production"
+    answerIndex: 1
+    explanation: "Going Further states exactly that observability is an architecture - one event per step from day one, not a dashboard bolted on later. Shipping an Agent reinforces that traces are a launch requirement, not optional polish."
 ---
 
-A knowledge check for the Production & Deployment module. The interactive
-quiz engine is coming soon; review the stateless handler composition, the
-handler you built, and the durable principles recap, then mark this
-complete when you are confident.
+A knowledge check for the Production & Deployment module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.
