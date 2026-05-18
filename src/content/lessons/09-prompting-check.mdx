@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on prompting and structured output."
 estMinutes: 4
+questions:
+  - prompt: "Why is the instruction considered an integral part of the policy?"
+    options:
+      - "It is decoration that makes prompts more polite"
+      - "Changing it changes the policy as surely as swapping model weights"
+      - "It only affects the model's tone, not its output shape"
+      - "It is cached separately and has no effect on behavior"
+    answerIndex: 1
+    explanation: "The instruction specifies the contract the rest of the loop depends on; changing it changes what the policy produces. Treating it as decoration is the common mistake the lesson warns against."
+  - prompt: "What makes a parser 'total' in the context of structured output?"
+    options:
+      - "It calls the model a second time if the first response is malformed"
+      - "It handles every possible response, including malformed ones, mapping each to a known safe action"
+      - "It rejects any response that does not exactly match the expected format and raises an exception"
+      - "It strips all whitespace before returning the raw model string"
+    answerIndex: 1
+    explanation: "A total parser covers every case, including malformed output, and always returns a defined action rather than crashing. Raising an exception or returning raw text violates the safety contract."
+  - prompt: "In the KIND: argument pattern from Lesson 7, what happens when the parsed kind is not in the VALID set?"
+    options:
+      - "The loop retries the prompt automatically"
+      - "The model is called again with a stricter instruction"
+      - "The response is returned as-is to the downstream branch"
+      - "The parser returns ('ANSWER', 'unparseable') as a safe fallback"
+    answerIndex: 3
+    explanation: "The parse_action function in the lesson returns ('ANSWER', 'unparseable') when the kind is absent or not in VALID. This keeps the loop running on a known safe tuple rather than crashing or routing to undefined behavior."
+  - prompt: "What is the best defense against output drift when a model provider updates weights?"
+    options:
+      - "Add more adjectives like 'concise' and 'always use the exact format' to the prompt"
+      - "A total parser that normalizes case and whitespace, plus a regression test suite"
+      - "Switch to a different model provider"
+      - "Increase the prompt length to cover more edge cases"
+    answerIndex: 1
+    explanation: "A robust parser that normalizes variants (case, spacing) absorbs drift; regression tests catch regressions immediately. Longer prompts add cost and new failure modes without actually pinning behavior."
+  - prompt: "Which defensive habit does Lesson 8 recommend for untrusted external content in an instruction?"
+    options:
+      - "Summarize it with a second model call before interpolating"
+      - "Limit it to 100 characters so it cannot carry malicious instructions"
+      - "Use structural separators (XML tags, delimiters, role boundaries) to signal where instructions end and data begins"
+      - "Log it after the fact so you can review it if something goes wrong"
+    answerIndex: 2
+    explanation: "Structural separators tell the model where instructions end and data begins, reducing the risk of prompt injection. Logging is good practice but does not prevent the attack; length limits are not a reliable defense."
 ---
 
-A knowledge check for the Prompting & Control module. The interactive quiz
-engine is coming soon; review the instruction-as-policy idea, structured
-output with total parsing, and the prompting pitfalls, then mark this
-complete when you are confident.
+A knowledge check for the Prompting & Control module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.
