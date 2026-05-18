@@ -2,7 +2,10 @@
 
 /* Self-hosted fonts (bundled into the static build, no external requests).
    Latin-only subsets — the site is English; this drops the unused
-   latin-ext/cyrillic/vietnamese subsets from the bundled payload. */
+   latin-ext/cyrillic/vietnamese subsets from the bundled payload.
+   NOTE: diacritic/non-Latin content added later (e.g. accented names in
+   lessons) will silently render in a system-font fallback, not Inter —
+   add the relevant `@fontsource/.../<subset>-*.css` import if that happens. */
 @import "@fontsource/inter/latin-400.css";
 @import "@fontsource/inter/latin-500.css";
 @import "@fontsource/inter/latin-600.css";
