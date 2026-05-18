@@ -13,7 +13,7 @@ export default function SidebarNav({
     <nav aria-label="Curriculum" className="text-sm">
       {curriculum.modules.map((m) => (
         <div key={m.id} className="mb-5">
-          <p className="mb-2 px-2 text-[0.7rem] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <p className="mb-2 px-2 text-[0.7rem] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {m.title}
           </p>
           <ul className="space-y-0.5">

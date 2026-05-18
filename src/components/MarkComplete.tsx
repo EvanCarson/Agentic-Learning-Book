@@ -10,7 +10,7 @@ export default function MarkComplete({ slug }: { slug: string }) {
       onClick={() => setComplete(slug, !done)}
       className={
         done
-          ? "btn-primary bg-emerald-600 hover:bg-emerald-700"
+          ? "btn-primary bg-emerald-700 hover:bg-emerald-800"
           : "btn-secondary"
       }
     >
