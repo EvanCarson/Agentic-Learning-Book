@@ -115,12 +115,32 @@ test.describe("curriculum", () => {
     ).toBeVisible();
   });
 
-  test("quiz: an un-authored check shows the review note", async ({ page }) => {
-    await page.goto("/learn/09-prompting-check");
-    await expect(page.getByRole("note")).toContainText(/coming soon/i);
+  test("quiz: Tool Use all-correct submission passes and completes", async ({
+    page,
+  }) => {
+    await page.goto("/learn/13-tools-check");
     await expect(
-      page.getByRole("button", { name: "Submit" }),
-    ).toHaveCount(0);
+      page.getByRole("button", { name: /Mark complete/i }),
+    ).toBeVisible();
+    for (const name of [
+      "Name, description, typed arguments, and deterministic implementation",
+      "The model selects a name from a registry you control; your runtime maps that name to a registered function and calls it",
+      "The tool result becomes the next observation and is fed back to the policy",
+      "It is a structured observation returned to the policy, which can then retry or degrade gracefully",
+      "A bounded attempt budget prevents runaway cost when a tool is broken or a resource does not exist",
+    ]) {
+      await page.getByRole("radio", { name, exact: true }).check();
+    }
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByRole("status")).toContainText("You scored 5 / 5");
+    await expect(
+      page.getByRole("button", { name: /Completed/i }),
+    ).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole("status")).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: /Completed/i }),
+    ).toBeVisible();
   });
 
   test("interactive lesson runs Python in-browser", async ({ page }) => {
