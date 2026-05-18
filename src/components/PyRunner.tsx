@@ -63,7 +63,7 @@ export default function PyRunner({ code }: { code: string }) {
     <div className="card my-6 overflow-hidden not-prose">
       <textarea
         aria-label="Python source code"
-        className="w-full resize-y border-0 bg-slate-900 p-4 font-mono text-sm text-slate-100 focus:outline-none"
+        className="w-full resize-y border-0 bg-slate-900 p-4 font-mono text-sm text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-400"
         rows={Math.max(4, source.split("\n").length)}
         value={source}
         onChange={(e) => setSource(e.target.value)}
