@@ -2,17 +2,31 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 <BaseLayout title="Agentic Learning">
-  <section class="py-12 text-center">
-    <h1 class="text-4xl font-bold">Learn to build AI agents</h1>
-    <p class="mx-auto mt-4 max-w-xl text-lg text-gray-600 dark:text-gray-400">
+  <section class="mx-auto max-w-3xl py-20 text-center sm:py-28">
+    <h1 class="text-balance text-5xl font-extrabold tracking-tight text-slate-900 sm:text-6xl dark:text-white">Learn to build AI agents</h1>
+    <p class="mx-auto mt-5 max-w-xl text-lg text-slate-600 dark:text-slate-400">
       One interactive lesson at a time. Read, edit, and run real agent
       code in your browser.
     </p>
     <a
       href="/learn"
-      class="mt-8 inline-block rounded bg-blue-600 px-5 py-2.5 font-medium text-white hover:bg-blue-700"
+      class="btn-primary mt-9 px-6 py-3 text-base"
     >
       Start the curriculum &rarr;
     </a>
+    <ul class="mt-16 grid grid-cols-1 gap-4 text-left sm:grid-cols-3">
+      <li class="card p-5">
+        <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Read</h2>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Concise, practical lessons from engineer to AI engineer.</p>
+      </li>
+      <li class="card p-5">
+        <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Run real code</h2>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Edit and execute agent code in your browser — no setup.</p>
+      </li>
+      <li class="card p-5">
+        <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Check yourself</h2>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Module quizzes and tracked progress as you go.</p>
+      </li>
+    </ul>
   </section>
 </BaseLayout>
