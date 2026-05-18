@@ -10,10 +10,10 @@ questions:
     options:
       - "The model conditions its answer on retrieved text rather than recalling facts from weights"
       - "The model is retrained on new data at query time"
-      - "Embeddings replace the model's attention mechanism during inference"
+      - "RAG fine-tunes the model on retrieved chunks before answering, updating its weights"
       - "Retrieval increases the model's context window size permanently"
     answerIndex: 0
-    explanation: "RAG gives the model the fact as retrieved text and asks it to reason over what was provided, shifting the task from recall to reading. Retraining at query time, replacing attention, and permanently expanding context windows are not what RAG does."
+    explanation: "RAG gives the model the fact as retrieved text and asks it to reason over what was provided, shifting the task from recall to reading. L14 explicitly contrasts RAG with retraining: the model weights are never updated at query time. Retraining at query time (whether described as standard retraining or fine-tuning on retrieved chunks) and permanently expanding context windows are not what RAG does."
   - prompt: "In the tiny retriever built in Lesson 15, how does the score() function select the best document?"
     options:
       - "It computes cosine similarity between embedding vectors"
@@ -26,10 +26,10 @@ questions:
     options:
       - "BLEU score"
       - "Perplexity"
-      - "F1 score"
+      - "Embedding vector dimensionality"
       - "recall@k"
     answerIndex: 3
-    explanation: "The lesson names recall@k as the metric: what fraction of queries return a relevant chunk in the top k. BLEU, perplexity, and F1 are standard NLP benchmarks the lesson explicitly says do not cover retrieval quality."
+    explanation: "L16 defines recall@k as 'what fraction of queries return a relevant chunk in the top k' -- the direct measure of retrieval relevance. BLEU score measures n-gram overlap between generated and reference text, not whether relevant chunks appear in retrieval results. Perplexity measures a language model's confidence on a text sequence, not retrieval relevance. Embedding vector dimensionality is a property of the vector space (e.g. 768 or 1536 dimensions), not a measure of whether the right chunk was retrieved."
   - prompt: "What does the RAG failure modes lesson say a well-designed RAG system should do when the retriever finds no relevant source?"
     options:
       - "Fall back to parametric knowledge so the user always gets an answer"
@@ -42,10 +42,10 @@ questions:
     options:
       - "Forces the model to cite every chunk it was given"
       - "Prevents stale context from reaching the model"
-      - "Increases recall@k by exposing more candidate passages to the model"
+      - "Improves answer quality by giving the model more evidence to draw on"
       - "Often produces worse answers because models reliably miss information in the middle of long contexts"
     answerIndex: 3
-    explanation: "Research cited in the lesson shows models use information at the beginning and end of long contexts but miss the middle, so ten chunks is often worse than three high-precision chunks. The fix is re-ranking before assembly, not adding more chunks."
+    explanation: "L16 states models reliably use information at the beginning and end of long contexts but miss the middle, so ten chunks is often worse than three high-precision chunks. Pasting in more chunks does not improve quality -- L16 says to re-rank before assembly and keep context lean. More chunks do not force citation, do not prevent staleness (that is an indexing problem), and do not improve answer quality -- L16 says the opposite."
 ---
 
 A knowledge check for the Retrieval & RAG module. Answer every question,
