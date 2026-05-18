@@ -16,12 +16,12 @@ questions:
     explanation: "The instruction specifies the contract the rest of the loop depends on; changing it changes what the policy produces. Treating it as decoration is the common mistake the lesson warns against."
   - prompt: "What makes a parser 'total' in the context of structured output?"
     options:
-      - "It calls the model a second time if the first response is malformed"
+      - "It only produces a defined action when the model returns perfectly formatted output"
       - "It handles every possible response, including malformed ones, mapping each to a known safe action"
       - "It rejects any response that does not exactly match the expected format and raises an exception"
       - "It strips all whitespace before returning the raw model string"
     answerIndex: 1
-    explanation: "A total parser covers every case, including malformed output, and always returns a defined action rather than crashing. Raising an exception or returning raw text violates the safety contract."
+    explanation: "A total parser covers every case, including malformed output, and always returns a defined action rather than crashing. Option (a) is exactly the failure a total parser eliminates: a parser that only works on perfectly formatted input is a partial parser - it must map the current malformed response to a safe action without depending on perfect formatting (and is orthogonal to whether you also retry). Raising an exception or returning raw text violates the same safety contract."
   - prompt: "In the KIND: argument pattern from Lesson 7, what happens when the parsed kind is not in the VALID set?"
     options:
       - "The loop retries the prompt automatically"
@@ -34,10 +34,10 @@ questions:
     options:
       - "Add more adjectives like 'concise' and 'always use the exact format' to the prompt"
       - "A total parser that normalizes case and whitespace, plus a regression test suite"
-      - "Switch to a different model provider"
+      - "Pin to an older model version forever and never upgrade"
       - "Increase the prompt length to cover more edge cases"
     answerIndex: 1
-    explanation: "A robust parser that normalizes variants (case, spacing) absorbs drift; regression tests catch regressions immediately. Longer prompts add cost and new failure modes without actually pinning behavior."
+    explanation: "A robust parser that normalizes variants (case, spacing) absorbs drift; regression tests catch regressions immediately. Longer prompts add cost and new failure modes without actually pinning behavior. Option (a) is wrong because adjectives do not pin output format reliably - the lesson explicitly states the fix is a declared grammar and test suite, not ever-more-forceful wording. Option (c) is wrong because pinning to an old version forever is brittle and not what the lesson advises - the durable fix is a parser and regression tests that absorb drift across versions, so you can upgrade safely."
   - prompt: "Which defensive habit does Lesson 8 recommend for untrusted external content in an instruction?"
     options:
       - "Summarize it with a second model call before interpolating"
