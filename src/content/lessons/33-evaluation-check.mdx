@@ -9,7 +9,7 @@ questions:
   - prompt: "Why are task-success metrics alone not sufficient for agentic systems?"
     options:
       - "They require an LLM judge and are therefore too expensive"
-      - "They only work when temperature is pinned to zero"
+      - "They only work when the model's temperature and seed are pinned"
       - "They cannot be compared with string equality and must use regex"
       - "An agent can produce the right answer by accident or via a flawed path that will fail later"
     answerIndex: 3
@@ -45,7 +45,7 @@ questions:
       - "The agent prompt is updated but the golden set labels are not; the comparator returns stale matches"
       - "LLM-judge verdicts shift when the underlying judge model is upgraded; stable scores hide model drift"
     answerIndex: 0
-    explanation: "Lesson 32 defines eval-set drift as the gap between the golden set's original distribution and shifted production traffic - new query patterns, phrasing, and edge cases. An agent whose golden-set pass rate is stable but whose production error rate is rising is the exact scenario described. Options C and D each point to real pitfalls covered in the lessons - stale labels and judge-model drift - but neither is the definition of eval-set drift."
+    explanation: "Lesson 32 defines eval-set drift as the gap between the golden set's original distribution and shifted production traffic - new query patterns, phrasing, and edge cases. An agent whose golden-set pass rate is stable but whose production error rate is rising is the exact scenario described. Option D points to a real pitfall the lessons cover (judge-model drift, lesson 30); option C describes a label-maintenance mistake, which is not what eval-set drift means."
 ---
 
 A knowledge check for the Evaluation & Testing module. Answer every question,
