@@ -8,43 +8,43 @@ estMinutes: 4
 questions:
   - prompt: "What is the core reason RAG reduces hallucinations compared to pure parametric recall?"
     options:
-      - "The model is retrained on new data at query time"
       - "The model conditions its answer on retrieved text rather than recalling facts from weights"
+      - "The model is retrained on new data at query time"
       - "Embeddings replace the model's attention mechanism during inference"
       - "Retrieval increases the model's context window size permanently"
-    answerIndex: 1
+    answerIndex: 0
     explanation: "RAG gives the model the fact as retrieved text and asks it to reason over what was provided, shifting the task from recall to reading. Retraining at query time, replacing attention, and permanently expanding context windows are not what RAG does."
   - prompt: "In the tiny retriever built in Lesson 15, how does the score() function select the best document?"
     options:
       - "It computes cosine similarity between embedding vectors"
-      - "It counts how many query tokens appear in the document using set intersection"
       - "It ranks documents by recency of their last update"
+      - "It counts how many query tokens appear in the document using set intersection"
       - "It calls an external API to score relevance"
-    answerIndex: 1
+    answerIndex: 2
     explanation: "The score function converts query and document to lowercase word sets and returns the size of their intersection -- plain keyword overlap. Embedding-based cosine similarity is explicitly described as the real-system upgrade, not the tiny retriever's method."
   - prompt: "According to the RAG failure modes lesson, what is the metric for measuring whether relevant chunks appear in the top-k results?"
     options:
       - "BLEU score"
       - "Perplexity"
-      - "recall@k"
       - "F1 score"
-    answerIndex: 2
+      - "recall@k"
+    answerIndex: 3
     explanation: "The lesson names recall@k as the metric: what fraction of queries return a relevant chunk in the top k. BLEU, perplexity, and F1 are standard NLP benchmarks the lesson explicitly says do not cover retrieval quality."
   - prompt: "What does the RAG failure modes lesson say a well-designed RAG system should do when the retriever finds no relevant source?"
     options:
       - "Fall back to parametric knowledge so the user always gets an answer"
-      - "Re-run the query with a larger k until a source is found"
       - "Return an explicit 'no supporting source' answer rather than guessing"
+      - "Re-run the query with a larger k until a source is found"
       - "Expand the chunk size until the index returns something"
-    answerIndex: 2
+    answerIndex: 1
     explanation: "The lesson states that 'no supporting source' must be a first-class answer and that falling back to parametric knowledge is exactly the pattern that ships confidently wrong answers. Re-running with larger k or expanding chunks are not the prescribed response to missing sources."
   - prompt: "The 'lost in the middle' phenomenon described in Lesson 16 means that pasting in many retrieved chunks:"
     options:
       - "Forces the model to cite every chunk it was given"
       - "Prevents stale context from reaching the model"
-      - "Often produces worse answers because models reliably miss information in the middle of long contexts"
       - "Increases recall@k by exposing more candidate passages to the model"
-    answerIndex: 2
+      - "Often produces worse answers because models reliably miss information in the middle of long contexts"
+    answerIndex: 3
     explanation: "Research cited in the lesson shows models use information at the beginning and end of long contexts but miss the middle, so ten chunks is often worse than three high-precision chunks. The fix is re-ranking before assembly, not adding more chunks."
 ---
 
