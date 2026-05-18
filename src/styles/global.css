@@ -50,7 +50,9 @@ body {
 
 /* Shared component classes — keep restyle DRY and consistent. */
 @layer components {
-  .btn {
+  .btn,
+  .btn-primary,
+  .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)]
       px-4 py-2 text-sm font-semibold transition-colors
       focus-visible:outline-none focus-visible:ring-2
@@ -59,23 +61,11 @@ body {
       disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)]
-      px-4 py-2 text-sm font-semibold transition-colors
-      focus-visible:outline-none focus-visible:ring-2
-      focus-visible:ring-accent-500 focus-visible:ring-offset-2
-      focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950
-      disabled:opacity-50 disabled:pointer-events-none
-      bg-accent-600 text-white hover:bg-accent-700
+    @apply bg-accent-600 text-white hover:bg-accent-700
       shadow-[var(--shadow-soft)];
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)]
-      px-4 py-2 text-sm font-semibold transition-colors
-      focus-visible:outline-none focus-visible:ring-2
-      focus-visible:ring-accent-500 focus-visible:ring-offset-2
-      focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950
-      disabled:opacity-50 disabled:pointer-events-none
-      border border-slate-300 text-slate-800 hover:bg-slate-100
+    @apply border border-slate-300 text-slate-800 hover:bg-slate-100
       dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800;
   }
   .card {
