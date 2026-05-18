@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on traces, trajectories, and trace-driven debugging."
 estMinutes: 4
+questions:
+  - prompt: "Why does Lesson 42 say print debugging is insufficient for agent loops?"
+    options:
+      - "Agent runs are non-deterministic, so the exact failing run cannot be re-created by re-running the code"
+      - "You can reconstruct the failing run from print output after the fact"
+      - "Re-running with the same input reliably reproduces the failure"
+      - "Free-form log strings capture all the information needed for debugging"
+    answerIndex: 0
+    explanation: "Lesson 42 states model outputs vary with temperature and version drift, so the exact run that produced the bug cannot be re-created by re-running -- you must record while the run is live. The other options are misconceptions Lesson 42 directly contradicts: reconstruction after the fact is ruled out, re-running is unreliable, and Lesson 43 explicitly forbids free-form log strings."
+  - prompt: "What is a trajectory, as defined in Lesson 42?"
+    options:
+      - "A single event capturing the agent's final answer and the total run duration"
+      - "A real-time alert that fires when a step produces an error"
+      - "The run id minted at the start of a run and propagated to every event"
+      - "The ordered sequence of events for a single run -- a complete, queryable record of what the agent saw and decided"
+    answerIndex: 3
+    explanation: "Lesson 42 defines a trajectory as the ordered sequence of events for a single run -- complete and queryable. Option 0 confuses a trajectory with a single event; option 1 describes an alert, which Lesson 42 places on top of the event stream, not as the stream itself; option 2 describes a correlation id (run id), a distinct concept also from Lesson 42."
+  - prompt: "What does the Tracer.step() method do in the recorder built in Lesson 43?"
+    options:
+      - "It replays stored observations through the policy and checks for action regressions"
+      - "It invokes the policy to decide the next action from the current observation"
+      - "It appends a structured record of the observation and action to the events list and returns the action"
+      - "It formats the observation and action as a log string and prints it to the console"
+    answerIndex: 2
+    explanation: "Lesson 43 shows Tracer.step(obs, action) appending {obs, action} to self.events and returning the action -- the trajectory becomes data. Option 0 confuses recording with replaying (a separate step described in Lessons 42 and 44). Option 1 describes what the policy function does, not the Tracer. Option 3 is the anti-pattern Lesson 43 explicitly rejects: structure it as data, never as free-form log strings."
+  - prompt: "According to Lesson 44, what is the correct first step when a stored trajectory is available for a production failure?"
+    options:
+      - "Re-run the agent with the same input to reproduce the failure in a live environment"
+      - "Load the stored trajectory, replay it by feeding each recorded observation through the current policy, and compare actions"
+      - "Add more structured event fields to the recorder so the next run captures more detail"
+      - "Identify the fault layer -- Perception, Policy, or Tool execution -- before touching code"
+    answerIndex: 1
+    explanation: "Lesson 44 prescribes loading the stored trajectory and replaying it as the first step -- feeding recorded observations through the current policy to compare actions. Option 0 is precisely what Lesson 44 says you do *without* traces (re-run and hope it reproduces, often it won't). Option 2 improves future runs but does not address the current failure. Option 3 is the second step (localise the bad step), which comes after replay."
+  - prompt: "After isolating the bad step in a traced failure, what does Lesson 44 say you should do next?"
+    options:
+      - "Immediately patch the policy layer since that is where agent decisions are made"
+      - "Re-run the agent live to confirm the fix produces the correct final answer"
+      - "Add an alert threshold on the step error rate to catch the same failure earlier"
+      - "Extract the (observation, expected action) pair from the bad step and add it to the evaluation suite as a regression case"
+    answerIndex: 3
+    explanation: "Lesson 44's best practice is: every production failure becomes a replayed trace and a new regression case before it is closed -- extract the failing (observation, expected action) pair and add it to the eval suite. Option 0 violates Lesson 44's explicit warning: knowing which layer is at fault before touching code prevents patching the wrong place. Option 1 reverts to live re-runs that Lesson 44 replaces with deterministic replay. Option 2 describes a monitoring signal Lesson 44 mentions but does not prescribe as the follow-up action for an isolated failure."
 ---
 
-A knowledge check for the Observability & Debugging module. The
-interactive quiz engine is coming soon; review structured traces and
-trajectories, the trace recorder you built, and the trace-to-regression
-workflow, then mark this complete when you are confident.
+A knowledge check for the Observability & Debugging module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.

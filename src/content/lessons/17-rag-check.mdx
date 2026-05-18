@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on grounding, retrieval, and RAG failure modes."
 estMinutes: 4
+questions:
+  - prompt: "What is the core reason RAG reduces hallucinations compared to pure parametric recall?"
+    options:
+      - "The model conditions its answer on retrieved text rather than recalling facts from weights"
+      - "The model is retrained on new data at query time"
+      - "RAG fine-tunes the model on retrieved chunks before answering, updating its weights"
+      - "Retrieval increases the model's context window size permanently"
+    answerIndex: 0
+    explanation: "RAG gives the model the fact as retrieved text and asks it to reason over what was provided, shifting the task from recall to reading. L14 explicitly contrasts RAG with retraining: the model weights are never updated at query time. Retraining at query time (whether described as standard retraining or fine-tuning on retrieved chunks) and permanently expanding context windows are not what RAG does."
+  - prompt: "In the tiny retriever built in Lesson 15, how does the score() function select the best document?"
+    options:
+      - "It computes cosine similarity between embedding vectors"
+      - "It ranks documents by recency of their last update"
+      - "It counts how many query tokens appear in the document using set intersection"
+      - "It calls an external API to score relevance"
+    answerIndex: 2
+    explanation: "The score function converts query and document to lowercase word sets and returns the size of their intersection -- plain keyword overlap. Embedding-based cosine similarity is explicitly described as the real-system upgrade, not the tiny retriever's method."
+  - prompt: "According to the RAG failure modes lesson, what is the metric for measuring whether relevant chunks appear in the top-k results?"
+    options:
+      - "BLEU score"
+      - "Perplexity"
+      - "Embedding vector dimensionality"
+      - "recall@k"
+    answerIndex: 3
+    explanation: "L16 defines recall@k as 'what fraction of queries return a relevant chunk in the top k' -- the direct measure of retrieval relevance. BLEU score measures n-gram overlap between generated and reference text, not whether relevant chunks appear in retrieval results. Perplexity measures a language model's confidence on a text sequence, not retrieval relevance. Embedding vector dimensionality is a property of the vector space (e.g. 768 or 1536 dimensions), not a measure of whether the right chunk was retrieved."
+  - prompt: "What does the RAG failure modes lesson say a well-designed RAG system should do when the retriever finds no relevant source?"
+    options:
+      - "Fall back to parametric knowledge so the user always gets an answer"
+      - "Return an explicit 'no supporting source' answer rather than guessing"
+      - "Re-run the query with a larger k until a source is found"
+      - "Expand the chunk size until the index returns something"
+    answerIndex: 1
+    explanation: "The lesson states that 'no supporting source' must be a first-class answer and that falling back to parametric knowledge is exactly the pattern that ships confidently wrong answers. Re-running with larger k or expanding chunks are not the prescribed response to missing sources."
+  - prompt: "The 'lost in the middle' phenomenon described in Lesson 16 means that pasting in many retrieved chunks:"
+    options:
+      - "Forces the model to cite every chunk it was given"
+      - "Prevents stale context from reaching the model"
+      - "Improves answer quality by giving the model more evidence to draw on"
+      - "Often produces worse answers because models reliably miss information in the middle of long contexts"
+    answerIndex: 3
+    explanation: "L16 states models reliably use information at the beginning and end of long contexts but miss the middle, so ten chunks is often worse than three high-precision chunks. Pasting in more chunks does not improve quality -- L16 says to re-rank before assembly and keep context lean. More chunks do not force citation, do not prevent staleness (that is an indexing problem), and do not improve answer quality -- L16 says the opposite."
 ---
 
-A knowledge check for the Retrieval & RAG module. The interactive quiz
-engine is coming soon; review the RAG shape with citations, the keyword
-retriever you built, and RAG failure modes, then mark this complete when
-you are confident.
+A knowledge check for the Retrieval & RAG module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.

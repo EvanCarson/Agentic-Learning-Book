@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on working memory, summarisation, and pitfalls."
 estMinutes: 4
+questions:
+  - prompt: "Without any memory mechanism, what is true of the agent loop?"
+    options:
+      - "The loop is entirely stateless; each decision call receives only what you explicitly hand it"
+      - "The loop automatically retains the last three turns via the runtime"
+      - "The model caches prior outputs internally, so the loop is stateful by default"
+      - "The loop stores state in the action layer between turns"
+    answerIndex: 0
+    explanation: "Lesson 18 states the loop 'is entirely stateless -- each call to the decision policy receives only whatever you hand it.' The other options describe automatic retention or caching that the lesson explicitly says does not exist without a memory mechanism."
+  - prompt: "Which statement best describes working memory as defined in the lessons?"
+    options:
+      - "An external database that persists user preferences across sessions"
+      - "A vector store used to retrieve relevant facts from previous runs"
+      - "A long-term log shared across all agent invocations in a system"
+      - "The running transcript of the current run, scoped to a single invocation, that disappears when the process ends"
+    answerIndex: 3
+    explanation: "Lesson 18 defines working memory as 'the running transcript of the current run... scoped to a single invocation, and disappears when the process ends.' The other options describe long-term or cross-run stores, which the lesson explicitly contrasts with working memory."
+  - prompt: "In the bounded-transcript Memory class from Lesson 19, what happens when the transcript exceeds its budget?"
+    options:
+      - "The entire transcript is cleared and a fresh one is started"
+      - "The oldest turn is evicted and appended to a running summary; the policy only ever sees context()"
+      - "The policy receives the full unbounded log and decides what to drop"
+      - "The runtime automatically truncates the newest turns to stay within budget"
+    answerIndex: 1
+    explanation: "Lesson 19 shows the Memory class evicting turns[0] into self.summary when len(turns) > budget, and the policy only ever sees context() -- never the raw log. Clearing the whole transcript, passing the full log to the policy, or truncating newest turns are all patterns the lesson does not use."
+  - prompt: "What is the correct role of a summary in the memory system described in Lesson 20?"
+    options:
+      - "Summaries replace the raw turn log once compression is complete"
+      - "Summaries are lossless and can fully reconstruct any discarded turn"
+      - "Summaries are a rendering concern -- they shape what the model sees, while the raw log remains the source of truth"
+      - "Summaries must be stored in long-term memory to avoid context bloat"
+    answerIndex: 2
+    explanation: "Lesson 20 states 'summaries are a rendering concern; they do not replace the source of truth' and the raw log must remain intact for replay or re-summarisation. Replacing the raw log or treating summaries as lossless both cause the irreversible data loss the lesson warns against."
+  - prompt: "What mitigation does Lesson 20 recommend for stale long-term memory facts?"
+    options:
+      - "Timestamp every long-term write, attach a validity scope, and treat retrieved facts as hypotheses to verify"
+      - "Re-read the same facts from working memory at the start of each turn to refresh them"
+      - "Delete any long-term fact older than one session to keep memory current"
+      - "Store facts only in working memory to avoid staleness across runs"
+    answerIndex: 0
+    explanation: "Lesson 20 recommends 'timestamping every long-term memory write, attaching a validity scope, and treating high-stakes retrieved facts as hypotheses to verify.' Re-reading from working memory, deleting old facts, or avoiding long-term storage entirely are not the mitigations the lesson presents."
 ---
 
-A knowledge check for the Memory & State module. The interactive quiz
-engine is coming soon; review working vs long-term memory, the bounded
-transcript with summarisation you built, and the memory pitfalls, then
-mark this complete when you are confident.
+A knowledge check for the Memory & State module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.
