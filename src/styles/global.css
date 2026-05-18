@@ -38,6 +38,8 @@
 
 :root {
   color-scheme: light dark;
+  /* Offset in-page anchor targets so the sticky header never overlaps them. */
+  scroll-padding-top: 4rem;
 }
 
 body {
