@@ -12,11 +12,11 @@ export default function SidebarNav({
   return (
     <nav aria-label="Curriculum" className="text-sm">
       {curriculum.modules.map((m) => (
-        <div key={m.id} className="mb-4">
-          <p className="mb-1 font-semibold uppercase tracking-wide text-gray-500">
+        <div key={m.id} className="mb-5">
+          <p className="mb-2 px-2 text-[0.7rem] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
             {m.title}
           </p>
-          <ul className="space-y-1">
+          <ul className="space-y-0.5">
             {m.lessons.map((l) => {
               const active = l.slug === currentSlug;
               return (
@@ -26,8 +26,8 @@ export default function SidebarNav({
                     aria-current={active ? "page" : undefined}
                     className={
                       active
-                        ? "font-semibold text-blue-600 hover:underline"
-                        : "text-gray-700 hover:underline dark:text-gray-300"
+                        ? "flex rounded-[var(--radius-md)] bg-accent-50 px-2 py-1.5 font-semibold text-accent-700 dark:bg-accent-950 dark:text-accent-200"
+                        : "flex rounded-[var(--radius-md)] px-2 py-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
                     }
                   >
                     <span aria-hidden="true">

@@ -14,13 +14,13 @@ interface Props {
 const { lesson, curriculum, adjacent } = Astro.props;
 ---
 <BaseLayout title={lesson.title}>
-  <div class="grid grid-cols-1 gap-8 md:grid-cols-[16rem_1fr]">
-    <aside class="md:border-r md:border-gray-200 md:pr-4 md:dark:border-gray-800">
+  <div class="grid grid-cols-1 gap-10 md:grid-cols-[17rem_1fr]">
+    <aside class="md:sticky md:top-20 md:max-h-[calc(100vh-6rem)] md:overflow-y-auto md:border-r md:border-slate-200 md:pr-5 md:dark:border-slate-800">
       <Sidebar curriculum={curriculum} currentSlug={lesson.slug} />
     </aside>
-    <article class="prose max-w-none dark:prose-invert">
+    <article class="prose prose-slate max-w-none dark:prose-invert prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-code:font-mono prose-headings:tracking-tight prose-a:text-accent-700 dark:prose-a:text-accent-300">
       <TrackVisit client:load slug={lesson.slug} />
-      <p class="text-xs uppercase tracking-wide text-gray-500">
+      <p class="badge">
         {lesson.type} · {lesson.estMinutes} min
       </p>
       <h1>{lesson.title}</h1>
@@ -36,18 +36,18 @@ const { lesson, curriculum, adjacent } = Astro.props;
       ) : (
         <p role="status">Unsupported lesson type: {lesson.type}</p>
       )}
-      <div class="mt-8 not-prose">
+      <div class="mt-10 not-prose">
         <MarkComplete client:load slug={lesson.slug} />
       </div>
       <nav
         aria-label="Lesson navigation"
-        class="mt-12 flex justify-between border-t border-gray-200 pt-4 text-sm dark:border-gray-800"
+        class="mt-14 flex justify-between gap-4 border-t border-slate-200 pt-6 text-sm dark:border-slate-800"
       >
         {adjacent.prev ? (
-          <a href={`/learn/${adjacent.prev.slug}`}>← {adjacent.prev.title}</a>
+          <a href={`/learn/${adjacent.prev.slug}`} class="card link-accent px-4 py-3 font-medium no-underline hover:shadow-[var(--shadow-raise)]">← {adjacent.prev.title}</a>
         ) : <span />}
         {adjacent.next ? (
-          <a href={`/learn/${adjacent.next.slug}`}>{adjacent.next.title} →</a>
+          <a href={`/learn/${adjacent.next.slug}`} class="card link-accent px-4 py-3 font-medium no-underline hover:shadow-[var(--shadow-raise)]">{adjacent.next.title} →</a>
         ) : <span />}
       </nav>
     </article>
