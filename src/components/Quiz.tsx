@@ -35,10 +35,10 @@ export default function Quiz({
       <div
         role="note"
         aria-label={`Quiz: ${title}`}
-        className="my-6 rounded border border-dashed border-gray-400 p-6 text-center dark:border-gray-600"
+        className="card my-6 p-6 text-center"
       >
-        <p className="text-lg font-semibold">Quiz: {title}</p>
-        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">Quiz: {title}</p>
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
           Knowledge checks are coming soon. For now, review the lesson and
           mark it complete when you are confident.
         </p>
@@ -64,16 +64,16 @@ export default function Quiz({
 
   return (
     <div className="my-6 not-prose">
-      <ol className="space-y-6">
+      <ol className="space-y-5">
         {questions.map((q, qi) => {
           const qResult = result?.perQuestion[qi];
           return (
-            <li key={qi}>
+            <li key={qi} className="card p-5">
               <fieldset>
-                <legend className="font-semibold">{q.prompt}</legend>
+                <legend className="text-base font-semibold text-slate-900 dark:text-slate-100">{q.prompt}</legend>
                 <div className="mt-2 space-y-1">
                   {q.options.map((opt, oi) => (
-                    <label key={oi} className="flex items-center gap-2">
+                    <label key={oi} className="flex cursor-pointer items-center gap-2.5 rounded-[var(--radius-md)] px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/60">
                       <input
                         type="radio"
                         name={`alb-q-${qi}`}
@@ -89,8 +89,8 @@ export default function Quiz({
                   <p
                     className={
                       qResult.correct
-                        ? "mt-2 text-sm text-green-700 dark:text-green-400"
-                        : "mt-2 text-sm text-red-700 dark:text-red-400"
+                        ? "mt-2 text-sm font-medium text-emerald-700 dark:text-emerald-400"
+                        : "mt-2 text-sm font-medium text-red-700 dark:text-red-400"
                     }
                   >
                     <span>
@@ -107,8 +107,8 @@ export default function Quiz({
       </ol>
 
       {result ? (
-        <div className="mt-6">
-          <p role="status" aria-live="polite" className="font-semibold">
+        <div className="mt-6 card p-5">
+          <p role="status" aria-live="polite" className="text-base font-semibold text-slate-900 dark:text-slate-100">
             You scored {result.correct} / {result.total} —{" "}
             {result.passed
               ? "passed. This lesson is marked complete."
@@ -117,7 +117,7 @@ export default function Quiz({
           <button
             type="button"
             onClick={retry}
-            className="mt-3 rounded border border-gray-400 px-4 py-2 text-sm font-medium dark:border-gray-600"
+            className="btn-secondary mt-3"
           >
             Retry
           </button>
@@ -127,7 +127,7 @@ export default function Quiz({
           type="button"
           onClick={() => setSubmitted(true)}
           disabled={!allAnswered}
-          className="mt-6 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="btn-primary mt-6"
         >
           Submit
         </button>

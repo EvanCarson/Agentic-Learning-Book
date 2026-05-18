@@ -12,10 +12,10 @@ export default function ModelSettings() {
   const cfg = getModelConfig();
 
   return (
-    <div className="mb-3 rounded border border-gray-300 p-3 text-sm dark:border-gray-700">
+    <div className="rounded-[var(--radius-md)] border border-slate-200 p-3 text-sm dark:border-slate-800">
       <fieldset>
-        <legend className="font-semibold">Model</legend>
-        <label className="mr-4">
+        <legend className="font-semibold text-slate-800 dark:text-slate-200">Model</legend>
+        <label className="mr-4 inline-flex items-center gap-1.5">
           <input
             type="radio"
             name="alb-model-mode"
@@ -24,7 +24,7 @@ export default function ModelSettings() {
           />{" "}
           Mock (default, free)
         </label>
-        <label>
+        <label className="mr-4 inline-flex items-center gap-1.5">
           <input
             type="radio"
             name="alb-model-mode"
@@ -38,35 +38,35 @@ export default function ModelSettings() {
       {cfg.mode === "real" && (
         <div className="mt-3 space-y-2">
           <label className="block">
-            <span className="block text-xs text-gray-600 dark:text-gray-400">
+            <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">
               Base URL (OpenAI-compatible)
             </span>
             <input
               type="text"
-              className="w-full rounded border border-gray-300 p-1 dark:border-gray-700 dark:bg-gray-900"
+              className="w-full rounded-[var(--radius-md)] border border-slate-300 bg-white p-1.5 font-mono text-sm dark:border-slate-700 dark:bg-slate-900"
               value={cfg.baseUrl}
               onChange={(e) => setModelConfig({ baseUrl: e.target.value })}
             />
           </label>
           <label className="block">
-            <span className="block text-xs text-gray-600 dark:text-gray-400">
+            <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">
               Model
             </span>
             <input
               type="text"
-              className="w-full rounded border border-gray-300 p-1 dark:border-gray-700 dark:bg-gray-900"
+              className="w-full rounded-[var(--radius-md)] border border-slate-300 bg-white p-1.5 font-mono text-sm dark:border-slate-700 dark:bg-slate-900"
               value={cfg.model}
               onChange={(e) => setModelConfig({ model: e.target.value })}
             />
           </label>
           <label className="block">
-            <span className="block text-xs text-gray-600 dark:text-gray-400">
+            <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">
               API key
             </span>
             <input
               type="password"
               aria-label="API key"
-              className="w-full rounded border border-gray-300 p-1 dark:border-gray-700 dark:bg-gray-900"
+              className="w-full rounded-[var(--radius-md)] border border-slate-300 bg-white p-1.5 font-mono text-sm dark:border-slate-700 dark:bg-slate-900"
               value={cfg.apiKey}
               onChange={(e) => setModelConfig({ apiKey: e.target.value })}
             />
@@ -74,11 +74,11 @@ export default function ModelSettings() {
           <button
             type="button"
             onClick={() => forgetKey()}
-            className="rounded border border-gray-400 px-2 py-1 text-xs dark:border-gray-600"
+            className="btn-secondary px-2 py-1 text-xs"
           >
             Forget key
           </button>
-          <p className="text-xs text-gray-600 dark:text-gray-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Real mode uses your key and your spend; requests go directly from
             your browser to the provider you configure. The key is kept only in
             memory and is cleared when you reload.

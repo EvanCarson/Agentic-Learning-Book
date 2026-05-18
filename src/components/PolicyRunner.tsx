@@ -70,23 +70,23 @@ export default function PolicyRunner({ code }: { code: string }) {
   const busy = status === "loading" || status === "running";
 
   return (
-    <div className="my-6 rounded border border-gray-300 dark:border-gray-700">
-      <div className="p-2">
+    <div className="card my-6 overflow-hidden not-prose">
+      <div className="border-b border-slate-200 p-3 dark:border-slate-800">
         <ModelSettings />
       </div>
       <textarea
         aria-label="Python source code"
-        className="w-full resize-y bg-gray-50 p-3 font-mono text-sm dark:bg-gray-900"
+        className="w-full resize-y border-0 bg-slate-900 p-4 font-mono text-sm text-slate-100 focus:outline-none"
         rows={Math.max(4, source.split("\n").length)}
         value={source}
         onChange={(e) => setSource(e.target.value)}
         spellCheck={false}
       />
-      <div className="flex items-center gap-3 border-t border-gray-300 p-2 dark:border-gray-700">
+      <div className="flex items-center gap-3 border-t border-slate-200 bg-slate-50 px-4 py-2.5 dark:border-slate-800 dark:bg-slate-900/60">
         <button
           onClick={run}
           disabled={busy}
-          className="rounded bg-blue-600 px-3 py-1 text-sm text-white disabled:opacity-50"
+          className="btn-primary"
         >
           {status === "loading"
             ? "Loading Python…"
@@ -95,11 +95,11 @@ export default function PolicyRunner({ code }: { code: string }) {
               : "Run"}
         </button>
         {status === "error" && (
-          <span className="text-sm text-red-600">Error — see output</span>
+          <span className="text-sm font-medium text-red-600 dark:text-red-400">Error — see output</span>
         )}
       </div>
       {output && (
-        <pre aria-live="polite" className="overflow-x-auto border-t border-gray-300 bg-black p-3 text-sm text-green-400 dark:border-gray-700">
+        <pre aria-live="polite" className="overflow-x-auto border-t border-slate-200 bg-slate-950 p-4 font-mono text-sm text-emerald-300 dark:border-slate-800">
 {output}
         </pre>
       )}
