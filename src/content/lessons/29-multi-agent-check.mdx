@@ -26,10 +26,10 @@ questions:
     options:
       - "It passes the entire conversation history so the worker has full context"
       - "It allows the worker to re-route back to the supervisor if the task is ambiguous"
-      - "It batches several subtasks into one message to reduce model calls"
+      - "It includes the supervisor's full reasoning so the worker can double-check the routing decision"
       - "It provides a short context plus a clear, narrow, self-contained instruction"
     answerIndex: 3
-    explanation: "Lesson 26 defines a well-designed handoff as a short context plus a clear, narrow instruction that is self-contained -- the receiving agent should not need to re-read the entire conversation history. Passing the full history or allowing free re-routing back are specifically the patterns that cause poorly scoped handoffs and loops."
+    explanation: "Lesson 26 defines a well-designed handoff as a short context plus a clear, narrow instruction that is self-contained -- the receiving agent should not need to re-read the entire conversation history. Passing the full history violates the short-context requirement directly. Including the supervisor's full reasoning is the same failure: the receiving agent receives unnecessary context rather than a scoped goal, making the handoff poorly bounded. Allowing free re-routing back to the supervisor is the pattern the lessons identify as causing loops and deadlock (lesson 28), not a feature of a well-designed handoff."
   - prompt: "How should cost budgeting work in a multi-agent system?"
     options:
       - "Each worker tracks its own step count and halts independently when its budget is exhausted"
@@ -42,10 +42,10 @@ questions:
     options:
       - "When the subtask is a single model call with a well-defined schema"
       - "When the subtask needs multiple steps and its own memory across those steps"
-      - "When the supervisor must route the same subtask to more than one worker"
+      - "When the subtask is slow and you want to run it in parallel for speed"
       - "When independent deployability of the subtask component is required"
     answerIndex: 0
-    explanation: "Lesson 28 draws a direct line: use a tool when the subtask is a single call with a well-defined schema -- no separate agent identity, no handoff protocol. Use a worker when the subtask needs its own agent loop -- multiple steps, its own tool set, its own memory. The cases for choosing a worker (multi-step loop, own memory, independent deployability) are the correct reasons to add an agent."
+    explanation: "Lesson 28 draws a direct line: use a tool when the subtask is a single call with a well-defined schema -- no separate agent identity, no handoff protocol. Use a worker when the subtask needs its own agent loop -- multiple steps, its own tool set, its own memory. The cases for choosing a worker (multi-step loop, own memory, independent deployability) are the correct reasons to add an agent. Speed and parallelism are not the criterion: lesson 26 states that parallelism alone does not justify multi-agent overhead, and lesson 28's tool-vs-worker distinction is about structure (single call vs. agent loop), not execution speed."
 ---
 
 A knowledge check for the Multi-Agent Systems module. Answer every question,
