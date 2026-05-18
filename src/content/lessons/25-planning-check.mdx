@@ -5,9 +5,50 @@ order: 4
 type: "quiz"
 summary: "Quick knowledge check on decomposition, plan-execute, and reflection."
 estMinutes: 4
+questions:
+  - prompt: "What does decomposition mean in the context of an agent?"
+    options:
+      - "Generating the list of subgoals before executing any of them"
+      - "Running the agent loop faster by skipping tool calls"
+      - "Breaking the model prompt into shorter tokens"
+      - "Replacing the policy with a lookup table"
+    answerIndex: 0
+    explanation: "Decomposition means the planner generates an ordered sequence of subgoals first, then the executor runs each one in turn. The key discipline is that no step is executed until the full plan exists. Skipping tool calls or shortening prompts are unrelated optimizations that the lesson does not describe as decomposition."
+  - prompt: "Why should the planner and executor be kept as separate roles?"
+    options:
+      - "So they can each use a different programming language"
+      - "To reduce the total number of model calls to one"
+      - "So a bad plan is inspectable and replaceable without touching the executor"
+      - "Because the executor cannot read plain text"
+    answerIndex: 2
+    explanation: "Keeping planning and execution separate means that when a run goes wrong you can tell whether the plan was wrong or the execution was wrong, and swap one without changing the other. Reducing model calls to one or language separation are not the stated reasons."
+  - prompt: "According to Lesson 22, when is adding a planning layer justified?"
+    options:
+      - "Whenever a task involves any tool call at all"
+      - "Always, because planning never adds latency"
+      - "Only when the model has fewer than 8k context tokens available"
+      - "Only when the task reliably needs multiple dependent steps and measurement shows the overhead pays off"
+    answerIndex: 3
+    explanation: "The lesson says to add planning only when a task reliably needs multiple dependent steps, and to measure first -- if single-step ReAct already succeeds 90% of the time, the planner must push that close to 100% to justify its extra cost. Adding planning to every tool call contradicts the cost-tradeoff analysis, and the other options introduce conditions the lesson never mentions."
+  - prompt: "What is 'bounded reflection' and why does it matter?"
+    options:
+      - "Limiting reflection to tasks under a fixed token count"
+      - "Using a separate model for critique so the generator is not involved"
+      - "Setting a hard iteration cap so the loop exits rather than burning tokens indefinitely"
+      - "Running reflection only on the final output, never on intermediate steps"
+    answerIndex: 2
+    explanation: "The lesson defines bounded reflection as placing a hard maximum number of passes on the loop so it exits with the best result so far rather than running forever. Without that cap, a model that repeatedly fails its own critic burns tokens indefinitely. Using a separate critic model is a different (optional) design choice, not the definition of bounded reflection."
+  - prompt: "When does reflection actively fail to improve output quality?"
+    options:
+      - "When the output is longer than one paragraph"
+      - "When the critic and generator share the same blind spot, causing both to miss the same constraint"
+      - "Whenever more than two reflection passes are attempted"
+      - "When the task has fewer than three subgoals in the plan"
+    answerIndex: 1
+    explanation: "Lesson 24 states that self-critique does not recover from systematic errors in the model's interpretation of the task: if the critic is built from the same model with a similar instruction, it will miss the same constraint. The fix is to change the instruction or the model, not to add more reflection passes. The other options are not conditions the lesson identifies as causing reflection to fail."
 ---
 
-A knowledge check for the Planning & Reasoning module. The interactive
-quiz engine is coming soon; review plan-execute versus single-step ReAct,
-the plan-execute loop you built, and the limits of reflection, then mark
-this complete when you are confident.
+A knowledge check for the Planning & Reasoning module. Answer every question,
+then submit to see your score and an explanation for each. Score 70%
+or higher to mark this lesson complete; you can retry as many times
+as you like.
