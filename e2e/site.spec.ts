@@ -203,4 +203,32 @@ test.describe("curriculum", () => {
       "prompt='unknown request' -> 'answer:i_dont_know'",
     );
   });
+
+  test("unknown URL renders the custom 404 error-free", async ({ page }) => {
+    const errs: string[] = [];
+    page.on("pageerror", (e) => errs.push(e.message));
+    page.on("console", (m) => {
+      // Ignore exactly the inherent HTTP-404 resource-status line the browser
+      // logs when the 404 page is served; pageerror and any other console
+      // error still fail the test.
+      const t = m.text();
+      if (
+        m.type() === "error" &&
+        !t.includes("favicon") &&
+        !t.includes(
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        )
+      )
+        errs.push(t);
+    });
+    await page.goto("/this-route-does-not-exist");
+    await expect(
+      page.getByRole("heading", { level: 1, name: /404/ }),
+    ).toBeVisible();
+    const cta = page
+      .getByRole("main")
+      .getByRole("link", { name: /Go to the curriculum/i });
+    await expect(cta).toHaveAttribute("href", "/learn");
+    expect(errs, errs.join("\n")).toHaveLength(0);
+  });
 });
