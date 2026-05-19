@@ -1,7 +1,20 @@
 # Custom 404 Page — Design Spec
 
 **Date:** 2026-05-19
-**Status:** Approved
+**Status:** Approved (with execution amendment — see below)
+
+> **Execution amendment (2026-05-19):** the e2e (Testing section) was
+> implemented with the `console`-error filter additionally ignoring the
+> exact line `Failed to load resource: the server responded with a
+> status of 404 (Not Found)` — on top of the existing `favicon`
+> exclusion. A page served at HTTP 404 inherently makes the browser log
+> that benign resource-status line; it is not a page defect, so the
+> original "favicon-only" filter could never pass. `pageerror` capture
+> remains strict (any real JS error still fails) and the exact-string
+> match cannot mask a different failure. Where this spec says "the same
+> filter the landing test uses (favicon)" / "with the existing favicon
+> filter", read it as "favicon plus that exact inherent 404-status
+> line".
 **Program context:** Agentic Learning Book — static Astro 6 site on
 Vercel (no SSR/adapter). Unknown URLs currently fall through to a bare
 host 404 with none of the site chrome or design system. This cycle adds
