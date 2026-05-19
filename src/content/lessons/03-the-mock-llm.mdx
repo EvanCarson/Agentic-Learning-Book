@@ -7,7 +7,7 @@ summary: "Swap the hardcoded policy for a deterministic mock LLM you control."
 estMinutes: 10
 ---
 
-import PyRunner from "../../components/PyRunner.tsx";
+import PolicyRunner from "../../components/PolicyRunner.tsx";
 
 **Objective:** make the policy a **mock LLM** — a deterministic
 `prompt -> response` you fully control — so you can learn agent mechanics
@@ -22,7 +22,9 @@ This is the same `policy(observation) -> action` seam from the previous
 lesson, just named for the LLM's perspective: the `observation` is the
 prompt you hand the model, and the `action` is the response it returns.
 
-<PyRunner client:visible code={`class MockLLM:
+<PolicyRunner client:visible code={`INSTR = "Reply with exactly 'tool:<name>' or 'answer:<text>'. Prompt: "
+
+class MockLLM:
     def __init__(self, table):
         self.table = table
 
@@ -34,13 +36,15 @@ policy = MockLLM({
     "say hi": "answer:hello",
 })
 
-def agent_step(prompt, llm):
-    decision = llm(prompt)
+async def agent_step(prompt, llm):
+    decision = (await alb_call_model(INSTR + prompt)) if alb_real_mode else llm(prompt)
     print(f"prompt={prompt!r} -> {decision!r}")
 
 for p in ["weather in nyc?", "say hi", "unknown request"]:
-    agent_step(p, policy)
+    await agent_step(p, policy)
 `} />
+
+Mock is the default and free. Switch the **Model** toggle above to **Real (your key)** to run this same code on your own OpenAI-compatible model.
 
 Here we call the policy one step at a time (`agent_step`) instead of the
 full `agent_loop` from the previous lesson — the loop is unchanged, we're
