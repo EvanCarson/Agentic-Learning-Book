@@ -7,12 +7,14 @@ summary: "Generate a plan, execute each step, and collect the results."
 estMinutes: 12
 ---
 
-import PyRunner from "../../components/PyRunner.tsx";
+import PolicyRunner from "../../components/PolicyRunner.tsx";
 
 **Objective:** turn a goal into an ordered plan, execute each step, and
 collect the step results — the plan-execute pattern.
 
-<PyRunner client:visible code={`PLANS = {
+<PolicyRunner client:visible code={`INSTR = "List the plan steps for the goal as a short comma-separated list, steps only. Goal: "
+
+PLANS = {
     "trip": ["weather", "pack", "book"],
 }
 
@@ -28,21 +30,28 @@ class MockPlanner:
 
 planner = MockPlanner(PLANS)
 
-def run(goal):
-    plan = planner(goal)
+def parse_plan(resp):
+    return [s.strip() for s in resp.split(",") if s.strip()]
+
+async def run(goal):
+    plan = parse_plan(await alb_call_model(INSTR + goal)) if alb_real_mode else planner(goal)
     print("plan for", goal, "=", plan)
     results = []
     for step in plan:
         results.append(do_step(step))
     print("results =", results)
 
-run("trip")
+await run("trip")
 `} />
 
+Mock is the default and free. Switch the **Model** toggle above to **Real (your key)** to run this same code on your own OpenAI-compatible model.
+
 `MockPlanner` is the Foundations `MockLLM` seam in planner clothing: a
-deterministic `goal -> plan`. A real planner is a model call with the
-same shape. Keeping planning and execution separate means a bad plan is
-inspectable and replaceable without touching the executor.
+deterministic `goal -> plan`. In real mode, the model returns a
+comma-separated list of steps that `parse_plan` splits into the same list
+shape -- empty or garbled output yields `[]`, matching the mock's own
+default for an unknown goal. Keeping planning and execution separate means
+a bad plan is inspectable and replaceable without touching the executor.
 
 > **Best practice:** keep planning and execution as separate units — you
 > should be able to inspect or swap the plan without changing how steps run.
