@@ -44,14 +44,16 @@ for p in ["weather in nyc?", "say hi", "unknown request"]:
     await agent_step(p, policy)
 `} />
 
-Mock is the default and free. Switch the **Model** toggle above to **Real (your key)** to run this same code on your own OpenAI-compatible model.
+Mock is the default and free. Switch the **Model** toggle above to **Real (your key)** to run this same code on your own OpenAI-compatible model — a real model may not reply in this exact `tool:`/`answer:` shape yet; tightening that is what the next few lessons add.
 
 Here we call the policy one step at a time (`agent_step`) instead of the
 full `agent_loop` from the previous lesson — the loop is unchanged, we're
 just isolating the policy call to see the mock respond.
 
-The agent code never changes when you go from this mock to a real model —
-it still just calls `policy(prompt)`. That is the entire point of the seam.
+The *interface* never changes when you go from this mock to a real model —
+`agent_step` still just takes a prompt and gets back a string `decision`.
+Only the line that produces `decision` swaps `llm(prompt)` for a real model
+call behind the **Model** toggle. That is the entire point of the seam.
 
 > **Best practice:** write every agent against a policy interface, then
 > develop and test against a deterministic mock. Real-model wiring becomes
