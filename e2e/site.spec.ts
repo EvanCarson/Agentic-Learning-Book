@@ -189,8 +189,10 @@ test.describe("curriculum", () => {
   test("reworked interactive lesson runs Python in-browser (mock default)", async ({
     page,
   }) => {
+    test.setTimeout(180_000);
     await page.goto("/learn/03-the-mock-llm");
     await page.getByRole("button", { name: /Run|Loading|Running/i }).click();
+    // PolicyRunner sets output atomically once the run resolves, so all 3 lines appear together; the 90s budget covers Pyodide cold-load.
     const out = page.locator("pre[aria-live='polite']");
     await expect(out).toContainText(
       "prompt='weather in nyc?' -> 'tool:get_weather'",
