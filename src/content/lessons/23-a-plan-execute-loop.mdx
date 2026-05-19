@@ -49,8 +49,10 @@ Mock is the default and free. Switch the **Model** toggle above to **Real (your 
 `MockPlanner` is the Foundations `MockLLM` seam in planner clothing: a
 deterministic `goal -> plan`. In real mode, the model returns a
 comma-separated list of steps that `parse_plan` splits into the same list
-shape -- empty or garbled output yields `[]`, matching the mock's own
-default for an unknown goal. Keeping planning and execution separate means
+shape; empty output yields `[]` (the mock's own default for an unknown
+goal), while a non-conforming chatty reply degrades into a best-effort
+list — an honest reminder that real output is unreliable and the parser
+is where you would harden it. Keeping planning and execution separate means
 a bad plan is inspectable and replaceable without touching the executor.
 
 > **Best practice:** keep planning and execution as separate units — you
