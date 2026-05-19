@@ -52,8 +52,9 @@ flagship — while the default deterministic mock output stays
   teaching moment about real-model unreliability and why the
   seam/parser exists.
 - **No engine change beyond the additive PolicyRunner globals.** No
-  change to `ModelSettings`, `callRealModel`, `modelConfig`, the
-  in-memory-key handling, `mockAgentLoopPolicy`, or `PyRunner`.
+  change to `ModelSettings`, `callRealModel` (`src/lib/realPolicy.ts`),
+  `modelConfig`, the in-memory-key handling, `mockAgentLoopPolicy`, or
+  `PyRunner`.
 - **Verification:** deterministic per-lesson mock-parity check + the
   unchanged lesson-02 PolicyRunner e2e anchor + one representative
   networked all-mock e2e on a reworked lesson. **No real-model call in
