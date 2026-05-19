@@ -7,7 +7,7 @@ summary: "Parse a constrained model response into a typed action."
 estMinutes: 11
 ---
 
-import PyRunner from "../../components/PyRunner.tsx";
+import PolicyRunner from "../../components/PolicyRunner.tsx";
 
 **Objective:** make the policy return a *constrained* response and parse
 it into a `(kind, argument)` action your loop can trust.
@@ -15,7 +15,9 @@ it into a `(kind, argument)` action your loop can trust.
 The mock returns strings shaped `KIND: argument`. The agent never acts on
 raw text — it parses, validates the `kind`, and only then proceeds.
 
-<PyRunner client:visible code={`VALID = {"TOOL", "ANSWER"}
+<PolicyRunner client:visible code={`INSTR = "Reply with exactly 'TOOL: <arg>' or 'ANSWER: <text>'. Prompt: "
+
+VALID = {"TOOL", "ANSWER"}
 
 class MockLLM:
     def __init__(self, table):
@@ -37,12 +39,18 @@ llm = MockLLM({
     "garbled": "??? no colon here",
 })
 
+async def decide(prompt):
+    return (await alb_call_model(INSTR + prompt)) if alb_real_mode else llm(prompt)
+
 for prompt in ["weather in nyc?", "say hi", "garbled"]:
-    print(prompt, "=>", parse_action(llm(prompt)))
+    print(prompt, "=>", parse_action(await decide(prompt)))
 `} />
 
+Mock is the default and free. Switch the **Model** toggle above to **Real (your key)** to run this same code on your own OpenAI-compatible model.
+
 This `MockLLM` is the same seam from Foundations, here named `llm` for
-the model's perspective — the agent still just calls it.
+the model's perspective — `decide` routes to it in mock mode and to the
+real model in real mode, so the rest of the loop never changes.
 
 Parsing + validating is the whole lesson: the model is untrusted input;
 the `(kind, argument)` tuple is the trusted contract your loop runs on.
