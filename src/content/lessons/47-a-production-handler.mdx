@@ -7,13 +7,17 @@ summary: "A stateless handler composing budget, guardrail, and trace."
 estMinutes: 12
 ---
 
-import PyRunner from "../../components/PyRunner.tsx";
+import PolicyRunner from "../../components/PolicyRunner.tsx";
 
 **Objective:** compose the course — a stateless `handle(request)` that
-checks a budget, guards the action, runs the policy, and returns a
-structured result. Swapping the mock for a real model (real integration: subsystem D) changes nothing here.
+checks a budget, guards the action, decides an action, and returns a
+structured result. In mock mode the decision comes from `policy`; in real
+mode the same line calls your model instead — the rest of `handle` is
+identical in both modes.
 
-<PyRunner client:visible code={`ALLOWED = {"search", "answer"}
+<PolicyRunner client:visible code={`INSTR = "Reply with exactly 'search: <arg>' or 'answer: <text>'. Request: "
+
+ALLOWED = {"search", "answer"}
 
 def policy(req):
     if "weather" in req:
@@ -24,22 +28,27 @@ def guard(action):
     name = action.split(":")[0].strip()
     return name in ALLOWED
 
-def handle(request, budget):
+async def handle(request, budget):
     if budget <= 0:
         return {"status": "rejected", "reason": "no_budget"}
-    action = policy(request)
+    action = (await alb_call_model(INSTR + request)) if alb_real_mode else policy(request)
     if not guard(action):
         return {"status": "blocked", "action": action}
     return {"status": "ok", "action": action, "trace": [request, action]}
 
 for req, b in [("weather?", 1), ("hello", 1), ("weather?", 0)]:
-    print(handle(req, b))
+    print(await handle(req, b))
 `} />
+
+Mock is the default and free. Switch the **Model** toggle above to **Real (your key)** to run this same code on your own OpenAI-compatible model.
 
 `policy` is the Foundations `MockLLM` seam; `handle` is stateless —
 inputs in, structured result out, with budget, guardrail, and trace
-applied. Production swaps `policy` for a real model (real integration: subsystem D) behind the same call;
-nothing else in `handle` changes.
+applied. In mock mode `handle` calls `policy`; switching to real mode
+routes that single decide line through your model while every other
+step — budget check, guard, structured result — stays identical. The
+guard still enforces `ALLOWED` in both modes, so a real model returning
+an out-of-policy action is still `blocked`.
 
 > **Best practice:** the request handler is pure orchestration of the
 > patterns you already built — keep it stateless and return structured
