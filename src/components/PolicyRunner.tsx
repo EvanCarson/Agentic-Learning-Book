@@ -55,6 +55,14 @@ export default function PolicyRunner({ code }: { code: string }) {
           ? callRealModel(observation, cfg)
           : mockAgentLoopPolicy(observation);
       pyodide.globals.set("policy", policy);
+      pyodide.globals.set(
+        "alb_real_mode",
+        cfg.mode === "real" && !!cfg.apiKey,
+      );
+      pyodide.globals.set(
+        "alb_call_model",
+        async (prompt: string): Promise<string> => callRealModel(prompt, cfg),
+      );
       let captured = "";
       pyodide.setStdout({ batched: (s: string) => (captured += s + "\n") });
       pyodide.setStderr({ batched: (s: string) => (captured += s + "\n") });

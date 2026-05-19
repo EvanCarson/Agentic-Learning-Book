@@ -7,12 +7,14 @@ summary: "Route subtasks from a supervisor to specialised worker agents."
 estMinutes: 12
 ---
 
-import PyRunner from "../../components/PyRunner.tsx";
+import PolicyRunner from "../../components/PolicyRunner.tsx";
 
 **Objective:** a supervisor routes each task to the worker whose role
 matches, then the workers' outputs are collected.
 
-<PyRunner client:visible code={`def math_worker(task):
+<PolicyRunner client:visible code={`INSTR = "Classify the task as exactly the single word 'math' or 'text'. Task: "
+
+def math_worker(task):
     return "math:" + task
 
 def text_worker(task):
@@ -29,20 +31,28 @@ class Supervisor:
 
 sup = Supervisor({"2+2": "math", "summarise": "text"})
 
-def run(tasks):
+def parse_role(resp):
+    return "math" if "math" in resp.lower() else "text"
+
+async def run(tasks):
     out = []
     for t in tasks:
-        role = sup.route(t)
+        role = parse_role(await alb_call_model(INSTR + t)) if alb_real_mode else sup.route(t)
         out.append(WORKERS[role](t))
     print(out)
 
-run(["2+2", "summarise", "unknown"])
+await run(["2+2", "summarise", "unknown"])
 `} />
 
-The `Supervisor` is the Foundations `MockLLM` seam as a router: a
-deterministic `task -> role`. It only decides *who* handles a task; the
-workers do the work. Unknown tasks default to the text worker (a safe
-generalist).
+Mock is the default and free. Switch the **Model** toggle above to **Real (your key)** to run this same code on your own OpenAI-compatible model.
+
+The routing structure is stable in both modes: a role is chosen, then
+`WORKERS[role]` runs. In mock mode, `sup.route(t)` looks up the role from a
+deterministic table. In real mode, `parse_role` maps the model's free-text
+classification to a role, defaulting to `"text"` for any non-conforming
+output — the same fallback the mock uses for unknown tasks. The supervisor
+decides *who* handles a task; the workers do the work. Coordination logic
+and work must not mix.
 
 > **Best practice:** give the supervisor one job — routing — and keep
 > workers independently testable. Coordination logic and work must not mix.
