@@ -1,11 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
 const LESSONS = fileURLToPath(new URL("../src/content/lessons", import.meta.url));
 
-// Each reworked D2 lesson: its expected byte-identical MOCK-mode stdout.
+// Captured pre-rework D2 mock-mode baseline. These strings are a deliberate
+// regression pin: a failure means a reworked lesson's mock path drifted —
+// fix the lesson, do NOT re-paste new output here without a reviewed re-baseline.
 const EXPECTED: Record<string, string> = {
   "03-the-mock-llm.mdx":
     "prompt='weather in nyc?' -> 'tool:get_weather'\n" +
@@ -41,6 +43,12 @@ function mockStdout(file: string): string {
     .split("\n")
     .map((l) => {
       const i = l.length - l.replace(/^ +/, "").length;
+      if (l.trim() !== "" && i % 2 !== 0) {
+        throw new Error(
+          `odd leading indent (${i}) in snippet line: ${JSON.stringify(l)} ` +
+            "— MDX normalization expects even (4->2, 8->6) indentation",
+        );
+      }
       return " ".repeat(Math.floor(i / 2)) + l.slice(i);
     })
     .join("\n");
@@ -57,10 +65,30 @@ function mockStdout(file: string): string {
     "async def __m():\n" +
     indented +
     "\nasyncio.run(__m())\n";
-  return execFileSync("python3", ["-c", harness], { encoding: "utf8" });
+  try {
+    return execFileSync("python3", ["-c", harness], {
+      encoding: "utf8",
+      timeout: 10_000,
+    });
+  } catch (e) {
+    const err = e as { stderr?: string; message?: string };
+    throw new Error(`${file}: ${err.stderr || err.message}`);
+  }
 }
 
 describe("D2 mock-parity (byte-identical mock output)", () => {
+  beforeAll(() => {
+    try {
+      execFileSync("python3", ["--version"], { stdio: "ignore" });
+    } catch {
+      throw new Error(
+        "d2-mock-parity requires `python3` on PATH (host CPython, used " +
+          "only to deterministically replay each lesson's mock snippet; " +
+          "distinct from Pyodide's WASM CPython at runtime).",
+      );
+    }
+  });
+
   for (const [file, expected] of Object.entries(EXPECTED)) {
     it(`${file}: mock stdout unchanged`, () => {
       expect(mockStdout(file)).toBe(expected);

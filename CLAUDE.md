@@ -26,7 +26,7 @@ buildable-but-broken change will otherwise deploy.
 
 ```bash
 npm run dev        # dev server, http://localhost:4321
-npm test           # Vitest unit tests (curriculum + progress store)
+npm test           # Vitest unit tests (curriculum + progress store); requires `python3` on PATH (used by `tests/d2-mock-parity.test.ts` to deterministically replay each reworked lesson's mock snippet; distinct from Pyodide's runtime WASM CPython)
 npm run typecheck  # astro check — AUTHORITATIVE type gate
 npm run build      # static build -> dist/ (validates content schema)
 npm run preview    # serve dist/ (run build first)
