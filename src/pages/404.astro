@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Page not found">
+  <section class="mx-auto max-w-3xl py-20 text-center sm:py-28">
+    <p class="text-sm font-semibold uppercase tracking-wide text-accent-600 dark:text-accent-400">Error 404</p>
+    <h1 class="text-balance mt-3 text-5xl font-extrabold tracking-tight text-slate-900 sm:text-6xl dark:text-white">404 — page not found</h1>
+    <p class="mx-auto mt-5 max-w-xl text-lg text-slate-600 dark:text-slate-400">
+      That page does not exist. Head back to the curriculum.
+    </p>
+    <div class="mt-9 flex items-center justify-center gap-5">
+      <a href="/learn" class="btn-primary px-6 py-3 text-base">
+        Go to the curriculum &rarr;
+      </a>
+      <a href="/" class="text-sm font-medium text-slate-600 underline underline-offset-4 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+        Home
+      </a>
+    </div>
+  </section>
+</BaseLayout>
