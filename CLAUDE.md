@@ -113,6 +113,11 @@ CDN-blocked PyRunner test.
   `a11y:`, `test:`, `refactor:`).
 - Design spec and plan (with execution amendments) live in
   `docs/superpowers/`.
+- Forward-looking, user-gated work (Subsystem A / CI workflow / manual
+  real-mode smoke check) is captured in `ROADMAP.md` at the repo root —
+  read it before proposing "what to do next" so prior decisions
+  (e.g. "no workflow now", "mock-only on these lessons by design")
+  aren't reopened by accident.
 
 ## Known limitations
 
