@@ -101,3 +101,11 @@ output `dist/`, install `npm ci`). Fully static — no serverless adapter.
 
 Served at a domain root, so absolute links work as-is (no `base` path).
 The build output (`dist/`) is also hostable on any static host.
+
+## What's next
+
+See [`ROADMAP.md`](./ROADMAP.md) — captures the three remaining
+user-gated items (Subsystem A: accounts + Supabase-synced progress;
+the GitHub Actions CI workflow; the manual real-mode BYO-key smoke
+check), what each one is blocked on, and the exact next steps to pick
+it up.
